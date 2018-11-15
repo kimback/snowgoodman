@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <title>Sample Page</title>
+	<!--jquery-->
+	<script
+	  src="https://code.jquery.com/jquery-3.3.1.min.js"
+	  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	  crossorigin="anonymous"></script>
+		
+	<script type="text/javascript">	
+	$(function(){
+		
+		$('#btn_get_athlete').click(function(){ 
+		  requestUserInfo();
+		});
+		
+		$('#btn_get_activity').click(function(){ 
+		  requestActivityInfo();
+		});
+		
+	});
+	
+	//운동선수 정보 가져오기
+	function requestUserInfo(){
+		$.get( "./getAthlete", { name: "", time: "" } )
+		  .done(function( data ) {
+			alert( "Data Loaded: " + data );
+		  });
+	}
+
+	//활동 정보 가져오기
+	function requestActivityInfo(){
+		$.get( "./getActivity", { name: "", time: "" } )
+		  .done(function( data ) {
+			alert( "Data Loaded: " + data );
+		  });
+	}
+	
+	</script>
+	
+    </head>        
+    <body>
+		<div>
+			<h3>1. 스트라바 인증완료 !</h3>
+			<ul>
+				<li> 인증을 끝낸후 운동선수 정보를 가져오기 위한 api 콜 예제 </li>
+			</ul>
+			<ul>
+				<input type="button" id="btn_get_athlete" value="유저정보가져오기" />
+			</ul>
+			<ul>
+				<input type="button" id="btn_get_activity" value="유저활동정보가져오기" />
+			</ul>
+			
+		</div>
+		
+    </body>
+</html>
