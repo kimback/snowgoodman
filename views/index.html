@@ -34,10 +34,13 @@
 	}
 
 	</script>
-	
 </head>
 
 <body id="page-top">
+  <!--dynamicScriptLine-->
+  <div style="display:none">#dynamicScriptLine#</div>
+  <!--dynamicScriptLine-->
+  
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
     <a class="navbar-brand mr-1" href="index.html">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -87,12 +90,13 @@
           </li>
         </ol>
         <!-- Icon Cards-->
-        <!-- Area Chart Example-->
+		
+        <!-- Chart Example-->
         <div class="card mb-3">
           <div class="card-header" contenteditable="true">
             <i class="fas fa-chart-area"></i>&nbsp;개인기록</div>
           <div class="card-body">
-            <canvas id="myBarChart" width="100%" height="30"></canvas>
+            <canvas id="myLineChart" width="100%" height="30"></canvas>
           </div>
         </div>
         <div class="row">
@@ -141,7 +145,13 @@
   <script src="/js/sb-admin.min.js"></script>
   <!-- Demo scripts for this page-->
   <script src="/js/demo/datatables-demo.js"></script>
-  <script src="/js/demo/chart-bar-demo.js"></script>
+  <!--<script src="/js/demo/chart-bar-demo.js"></script>-->
+  
+  <!--chart유틸-->
+  <script src="/js/chart.js/utils.js"></script>
+  <!--개인기록차트-->
+  <script src="/js/index_chart.js"></script> 
+  
   <!--<pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>-->
 </body>
 

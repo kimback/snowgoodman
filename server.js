@@ -10,7 +10,6 @@ var querystring = require('querystring');
 //---------------변수 및 사용관련-------------------
 var app = express();
 var sess = '';
-var postData = '';
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
@@ -77,6 +76,7 @@ app.get('/*auth1result*', function(req, res){
 	console.log('-------------auth1result-----------');
 	console.log(req.query); //인증받은값
 	
+	var postData = '';
 	postData = querystring.stringify({
 	'client_id' : '29632', //개발단id
 	'client_secret' : '1ea7a6e9fc6933ce50addb2eedbdca22b30500ed', //개발단pw
@@ -86,7 +86,7 @@ app.get('/*auth1result*', function(req, res){
 		
 	console.log(postData);
 	//인증2
-	requestAuth2(req, res);
+	requestAuth2(req, res, postData);
 	
 });
 
@@ -100,14 +100,14 @@ app.get('/getActivity', function(req, res){
 	console.log(activityOptions);
 	
 	//파라미터완성
-	postData = '';
+	var postData = '';
 	postData = querystring.stringify({
 		'id' : sess.userId,
 		'include_all_efforts' : ''
 	});
 	
-	//운동선수 데이터
-	getActivityData(req, res);
+	//활동 데이터
+	getActivityData(req, res, postData);
 });
 
 //운동선수
@@ -141,10 +141,23 @@ app.get('/actionIndex', function(req, res){
       if (err) {
          console.log(err);
       }else{
-         dynamicContent = data.toString();
 		 console.log("200" + dynamicContent.toString());
+		 dynamicContent = data.toString();
 		 var output = dynamicContent.toString().replace('#userLine#', '<span>안녕하세요' + userId + '(' + userName + ')님</span>');
-		 res.send(output);
+		 var output2 = output.toString().replace('#dynamicScriptLine#', 
+		 `<script type="text/javascript">
+			$.get("/getActivity", function(data, status){
+				alert("Data: " + data + "Status: " + status);
+			});
+			
+			$.get("/getAthlete", function(data, status){
+				alert("Data: " + data + "Status: " + status);
+			});
+		 </script>`);
+		 res.send(output2);
+		 
+		 //체인성 작업 서버에서 진행
+		 //dataRefreshAndUpdate(req, res);
       }
    });
 	
@@ -157,8 +170,9 @@ app.get('/actionIndex', function(req, res){
 
 //--------------------펑션---------------------------
 
+
 //인증2
-function requestAuth2(req, res){
+function requestAuth2(req, res, postData){
 	var httpsRequest = https.request(authOptions, function(response){//콜백
 		console.log('-------------auth2-----------');
 		handleResponse(response, req, res, 'auth');
@@ -167,8 +181,37 @@ function requestAuth2(req, res){
 	httpsRequest.end();//http call execute
 }
 
-//운동선수 조회 (토큰만으로 조회함)
-function getActivityData(req, res){
+
+//필요 데이터 리플레쉬 & 업데이트
+//필요정보를 조회하고 데이터를 서버에 업데이트 한다.
+function dataRefreshAndUpdate(req, res){
+	startGetActivity(req, res);
+	startGetAthleteData(req, res);
+}
+
+
+//활동조회 시작
+function startGetActivity(req, res){
+	console.log('-------------getActivity-----------');
+	
+	//해더 완성
+	activityOptions.headers.Authorization = 'Bearer ' + sess.access_token;
+	console.log(activityOptions);
+	
+	//파라미터완성
+	var postData = '';
+	postData = querystring.stringify({
+		'id' : sess.userId,
+		'include_all_efforts' : ''
+	});
+	
+	//운동선수 데이터
+	getActivityData(req, res, postData);
+	
+}
+
+//활동 조회 (토큰만으로 조회함)
+function getActivityData(req, res, postData){
 	var httpsRequest = https.request(activityOptions, function(response){//콜백
 		console.log('-------------getActivityData-----------');
 		handleResponse(response, req, res, 'activity');
@@ -177,6 +220,19 @@ function getActivityData(req, res){
 	httpsRequest.end();//http call execute
 	
 }
+
+
+function startGetAthleteData(req, res){
+	console.log('-------------getAthlete-----------');
+	//console.log('-------------sess.access_token-----------' + sess.access_token);
+	athleteOptions.headers.Authorization = 'Bearer ' + sess.access_token;
+	console.log(athleteOptions);
+	
+	//운동선수 데이터
+	getAthleteData(req, res);
+	
+}
+
 
 //운동선수 조회 (토큰만으로 조회함)
 function getAthleteData(req, res){
@@ -217,14 +273,18 @@ function handleResponse(response, req, res, type) {
 		sess.profilePic = jsonContent.athlete.profile;
 		
 		console.log(sess);
-		
 		res.send('<h1>strava connected !</h1><script>window.location.replace("' + './actionIndex' + '");</script>');
 		
-		
 	}else if(type === 'athlete'){
-		res.send(serverData);
+		//DB에 저장하는 로직 필요
+		//...
+		console.log(serverData);
+		res.send(serverData.toString());
 	}else if(type === 'activity'){
-		res.send(serverData);
+		//DB에 저장하는 로직 필요
+		//...
+		console.log(serverData.toString());
+		res.send(serverData.toString());
 	}
 	
   });
