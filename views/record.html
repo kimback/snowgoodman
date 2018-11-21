@@ -28,15 +28,11 @@
   <script src="/js/datatables/dataTables.bootstrap4.js"></script>
   <!-- Custom scripts for all pages-->
   <script src="/js/sb-admin.min.js"></script>
-  <!-- Demo scripts for this page-->
-  <script src="/js/demo/datatables-demo.js"></script>
-  <script src="/js/demo/chart-area-demo.js"></script>
-  <script src="/js/demo/chart-pie-demo.js"></script>
   
   <!--chart유틸-->
   <script src="/js/chart.js/utils.js"></script>
   <!--개인기록차트-->
-  <script src="/js/index_chart.js"></script> 
+  <script src="/js/record_chart.js"></script> 
   
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
@@ -77,6 +73,7 @@
 </head>
 
 <body id="page-top">
+  <input type="hidden" id="authComp" value="#authVal#"/>
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
     <a class="navbar-brand mr-1" href="index.html">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -649,7 +646,12 @@
   </a>
   <!-- Logout Modal-->
   
-  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>
+  <!-- Demo scripts for this page-->
+  <script src="/js/demo/datatables-demo.js"></script>
+  <script src="/js/demo/chart-area-demo.js"></script>
+  <script src="/js/demo/chart-pie-demo.js"></script>
+  
+  <!--<pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>-->
 </body>
 
 </html>

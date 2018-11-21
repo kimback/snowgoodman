@@ -68,7 +68,12 @@ app.engine('html', require('ejs').renderFile);
 //--------------라우터---------------------
  //index
  app.get('/index',function(req,res){
-	res.render('index.html');
+	indexPaging(req, res);
+ });
+ 
+  //record
+ app.get('/record',function(req,res){
+	recordPaging(req, res);
  });
  
 //인증1
@@ -125,80 +130,68 @@ app.get('/getAthlete', function(req, res){
 
 //동적파일 서비스---------------------
 app.get('/actionIndex', function(req, res){
-  //var lis = '';
-  //for(var i = 0; i <5; i++){
-      //lis += '<li>coding ' + i + '</li>';
-  //}
-  
-  // 자바스크립트 새로운 표준 formatted text 기능
-  // ` `(grave accent) 사용을 통해서 JS에서 여려줄의 코드를 넣을 수 없는 문제를 해결
-  
-	var userId = sess.userId;
-	var userName = sess.userName;
-	var dynamicContent = '';
-	
-	fs.readFile('./views/index.html', function (err, data) {
-      if (err) {
-         console.log(err);
-      }else{
-		 console.log("200" + dynamicContent.toString());
-		 dynamicContent = data.toString();
-		 var output = dynamicContent.toString().replace('#userLine#', '<span>안녕하세요' + userId + '(' + userName + ')님</span>');
-		 var output2 = output.toString().replace('#authVal#', '1'
-		 /*
-		 `<script type="text/javascript">
-			var colorNames = Object.keys(window.chartColors);
-		 
-			$.get("/getActivity", function(data, status){
-				alert("Data: " + data + "Status: " + status);
-				var jsonContent = JSON.parse(data);
-				
-				var colorName = colorNames[config.data.datasets.length % colorNames.length];
-				var newColor = window.chartColors[colorName];
-				var newDataset = {
-					label: '날짜별데이터',
-					backgroundColor: newColor,
-					borderColor: newColor,
-					data: [],
-					fill: false
-				};
-				
-				//라벨 x축
-				for(var i=0; i<jsonContent.length; ++i){
-					config.data.labels.push(formatDate(jsonContent[i].start_date));
-				}
-				
-				//데이터 y축
-				for (var index = 0; index < config.data.labels.length; ++index) {
-					newDataset.data.push(randomScalingFactor());
-				}
-				config.data.datasets.push(newDataset);
-				window.myLine.update();
-				
-			});
-			
-			$.get("/getAthlete", function(data, status){
-				alert("Data: " + data + "Status: " + status);
-				var jsonContent = JSON.parse(data);
-			});
-		 </script>`
-		 */
-		 );
-		 res.send(output2);
-		 
-		 //체인성 작업 서버에서 진행
-		 //dataRefreshAndUpdate(req, res);
-      }
-   });
-	
+	indexPaging(req, res);
 });
 //동적파일 서비스---------------------
 
 
 //-------------라우터----------------------
 	
+  // 자바스크립트 새로운 표준 formatted text 기능
+  // ` `(grave accent) 사용을 통해서 JS에서 여려줄의 코드를 넣을 수 없는 문제를 해결할수있음
+  
 
 //--------------------펑션---------------------------
+
+function indexPaging(req, res){
+	var userId = sess.userId;
+	var userName = sess.userName;
+	var dynamicContent = '';
+	
+	if(userId != undefined && userId != ''){
+			fs.readFile('./views/index.html', function (err, data) {
+			  if (err) {
+				 console.log(err);
+			  }else{
+				 console.log("200" + dynamicContent.toString());
+				 dynamicContent = data.toString();
+				 var output = dynamicContent.toString().replace('#userLine#', '<h3>안녕하세요. ' + userId + '(' + userName + ')님</h3>');
+				 var output2 = output.toString().replace('#authVal#', '1');
+				 res.send(output2);
+			  }
+		  });
+	}else{
+		res.render('index.html');
+	}
+}
+
+function recordPaging(req, res){
+	var userId = sess.userId;
+	var userName = sess.userName;
+	var dynamicContent = '';
+	
+	if(userId != undefined && userId != ''){
+			fs.readFile('./views/record.html', function (err, data) {
+			  if (err) {
+				 console.log(err);
+			  }else{
+				 console.log("200" + dynamicContent.toString());
+				 dynamicContent = data.toString();
+				 var output = dynamicContent.toString().replace('#userLine#', '<h3>안녕하세요. ' + userId + '(' + userName + ')님</h3>');
+				 var output2 = output.toString().replace('#authVal#', '1');
+				 res.send(output2);
+			  }
+		  });
+	}else{
+		res.render('record.html');
+	}
+}
+
+
+
+
+
+
 
 //인증2
 function requestAuth2(req, res, postData){
