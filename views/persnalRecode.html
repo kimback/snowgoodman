@@ -16,6 +16,64 @@
   <link href="/js/datatables/dataTables.bootstrap4.css" rel="stylesheet">
   <!-- Custom styles for this template-->
   <link href="/css/sb-admin.css" rel="stylesheet">
+  
+  <!-- Bootstrap core JavaScript-->
+  <script src="/js/jquery/jquery.min.js"></script>
+  <script src="/js/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="/js/jquery-easing/jquery.easing.min.js"></script>
+  <!-- Page level plugin JavaScript-->
+  <script src="/js/chart.js/Chart.min.js"></script>
+  <script src="/js/datatables/jquery.dataTables.js"></script>
+  <script src="/js/datatables/dataTables.bootstrap4.js"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="/js/sb-admin.min.js"></script>
+  <!-- Demo scripts for this page-->
+  <script src="/js/demo/datatables-demo.js"></script>
+  <script src="/js/demo/chart-area-demo.js"></script>
+  <script src="/js/demo/chart-pie-demo.js"></script>
+  
+  <!--chart유틸-->
+  <script src="/js/chart.js/utils.js"></script>
+  <!--개인기록차트-->
+  <script src="/js/index_chart.js"></script> 
+  
+  <script type="text/javascript">
+	<!--개발클라이언트id사용-->
+	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	
+	$(function(){
+		$('#stravaConnect').click(function(){
+		  requestUserAuth();
+		});
+	});
+	
+	function requestUserAuth(){
+		window.location.replace(authUrl);
+	}
+	
+	//날짜포맷 util
+	function formatDate(date) {
+		var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+
+		if (month.length < 2) month = '0' + month;
+		if (day.length < 2) day = '0' + day;
+
+		return [year, month, day].join('-');
+	}
+	
+	function convertDistance(distance){
+		var result = 0;
+		if(distance > 0){
+			result = (distance / 1000);
+		}
+		return result.toFixed(2);
+	}
+
+	</script>
 </head>
 
 <body id="page-top">
@@ -27,7 +85,9 @@
     <!-- Navbar Search -->
     <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
       <div class="input-group">
-        <button type="button" class="btn btn-warning">스트라바 접속 아이콘</button>
+        #userLine#
+        <button id="stravaConnect" type="button" class="btn" 
+		style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
       </div>
     </form>
     <!-- Navbar -->
@@ -588,21 +648,7 @@
     <i class="fas fa-angle-up"></i>
   </a>
   <!-- Logout Modal-->
-  <!-- Bootstrap core JavaScript-->
-  <script src="/js/jquery/jquery.min.js"></script>
-  <script src="/js/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <!-- Core plugin JavaScript-->
-  <script src="/js/jquery-easing/jquery.easing.min.js"></script>
-  <!-- Page level plugin JavaScript-->
-  <script src="/js/chart.js/Chart.min.js"></script>
-  <script src="/js/datatables/jquery.dataTables.js"></script>
-  <script src="/js/datatables/dataTables.bootstrap4.js"></script>
-  <!-- Custom scripts for all pages-->
-  <script src="/js/sb-admin.min.js"></script>
-  <!-- Demo scripts for this page-->
-  <script src="/js/demo/datatables-demo.js"></script>
-  <script src="/js/demo/chart-area-demo.js"></script>
-  <script src="/js/demo/chart-pie-demo.js"></script>
+  
   <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>
 </body>
 

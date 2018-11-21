@@ -144,16 +144,46 @@ app.get('/actionIndex', function(req, res){
 		 console.log("200" + dynamicContent.toString());
 		 dynamicContent = data.toString();
 		 var output = dynamicContent.toString().replace('#userLine#', '<span>안녕하세요' + userId + '(' + userName + ')님</span>');
-		 var output2 = output.toString().replace('#dynamicScriptLine#', 
+		 var output2 = output.toString().replace('#authVal#', '1'
+		 /*
 		 `<script type="text/javascript">
+			var colorNames = Object.keys(window.chartColors);
+		 
 			$.get("/getActivity", function(data, status){
 				alert("Data: " + data + "Status: " + status);
+				var jsonContent = JSON.parse(data);
+				
+				var colorName = colorNames[config.data.datasets.length % colorNames.length];
+				var newColor = window.chartColors[colorName];
+				var newDataset = {
+					label: '날짜별데이터',
+					backgroundColor: newColor,
+					borderColor: newColor,
+					data: [],
+					fill: false
+				};
+				
+				//라벨 x축
+				for(var i=0; i<jsonContent.length; ++i){
+					config.data.labels.push(formatDate(jsonContent[i].start_date));
+				}
+				
+				//데이터 y축
+				for (var index = 0; index < config.data.labels.length; ++index) {
+					newDataset.data.push(randomScalingFactor());
+				}
+				config.data.datasets.push(newDataset);
+				window.myLine.update();
+				
 			});
 			
 			$.get("/getAthlete", function(data, status){
 				alert("Data: " + data + "Status: " + status);
+				var jsonContent = JSON.parse(data);
 			});
-		 </script>`);
+		 </script>`
+		 */
+		 );
 		 res.send(output2);
 		 
 		 //체인성 작업 서버에서 진행
@@ -170,7 +200,6 @@ app.get('/actionIndex', function(req, res){
 
 //--------------------펑션---------------------------
 
-
 //인증2
 function requestAuth2(req, res, postData){
 	var httpsRequest = https.request(authOptions, function(response){//콜백
@@ -181,14 +210,12 @@ function requestAuth2(req, res, postData){
 	httpsRequest.end();//http call execute
 }
 
-
 //필요 데이터 리플레쉬 & 업데이트
 //필요정보를 조회하고 데이터를 서버에 업데이트 한다.
 function dataRefreshAndUpdate(req, res){
 	startGetActivity(req, res);
 	startGetAthleteData(req, res);
 }
-
 
 //활동조회 시작
 function startGetActivity(req, res){
@@ -221,7 +248,6 @@ function getActivityData(req, res, postData){
 	
 }
 
-
 function startGetAthleteData(req, res){
 	console.log('-------------getAthlete-----------');
 	//console.log('-------------sess.access_token-----------' + sess.access_token);
@@ -233,7 +259,6 @@ function startGetAthleteData(req, res){
 	
 }
 
-
 //운동선수 조회 (토큰만으로 조회함)
 function getAthleteData(req, res){
 	var httpsRequest = https.request(athleteOptions, function(response){//콜백
@@ -244,7 +269,6 @@ function getAthleteData(req, res){
 	httpsRequest.end();//http call execute
 	
 }
-
 
 //핸들링
 function handleResponse(response, req, res, type) {

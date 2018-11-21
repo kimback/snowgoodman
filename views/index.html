@@ -16,8 +16,27 @@
   <link href="/js/datatables/dataTables.bootstrap4.css" rel="stylesheet">
   <!-- Custom styles for this template-->
   <link href="/css/sb-admin.css" rel="stylesheet">
-    <!-- Bootstrap core JavaScript-->
+  
+  <!--jquery-->
   <script src="/js/jquery/jquery.min.js"></script>
+  <!-- Bootstrap core JavaScript-->
+  <script src="/js/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="/js/jquery-easing/jquery.easing.min.js"></script>
+  <!-- Page level plugin JavaScript-->
+  <script src="/js/chart.js/Chart.min.js"></script>
+  <script src="/js/datatables/jquery.dataTables.js"></script>
+  <script src="/js/datatables/dataTables.bootstrap4.js"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="/js/sb-admin.min.js"></script>
+  <!-- Demo scripts for this page-->
+  <script src="/js/demo/datatables-demo.js"></script>
+  <!--<script src="/js/demo/chart-bar-demo.js"></script>-->
+  
+  <!--chart유틸-->
+  <script src="/js/chart.js/utils.js"></script>
+  <!--개인기록차트-->
+  <script src="/js/index_chart.js"></script> 
   
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
@@ -32,15 +51,33 @@
 	function requestUserAuth(){
 		window.location.replace(authUrl);
 	}
+	
+	//날짜포맷 util
+	function formatDate(date) {
+		var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+
+		if (month.length < 2) month = '0' + month;
+		if (day.length < 2) day = '0' + day;
+
+		return [year, month, day].join('-');
+	}
+	
+	function convertDistance(distance){
+		var result = 0;
+		if(distance > 0){
+			result = (distance / 1000);
+		}
+		return result.toFixed(2);
+	}
 
 	</script>
 </head>
 
 <body id="page-top">
-  <!--dynamicScriptLine-->
-  <div style="display:none">#dynamicScriptLine#</div>
-  <!--dynamicScriptLine-->
-  
+  <input type="hidden" id="authComp" value="#authVal#"/>
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
     <a class="navbar-brand mr-1" href="index.html">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
@@ -105,12 +142,233 @@
               <div class="card-header" style="">
                 <i class="fas fa-list-alt"></i>&nbsp;랭킹</div>
               <div class="card-body">
-                <canvas id="myAreaChart" width="100%" height="30"></canvas>
+                <!--<canvas id="myAreaChart" width="100%" height="30"></canvas>-->
+				<!--table start-->
+				<div class="table-responsive">
+				  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+					<thead>
+					  <tr>
+						<th>Name</th>
+						<th>Position</th>
+						<th>Office</th>
+						<th>Age</th>
+						<th>Start date</th>
+						<th>Salary</th>
+					  </tr>
+					</thead>
+					<tfoot>
+					  <tr>
+						<th>Name</th>
+						<th>Position</th>
+						<th>Office</th>
+						<th>Age</th>
+						<th>Start date</th>
+						<th>Salary</th>
+					  </tr>
+					</tfoot>
+					<tbody>
+					  <tr>
+						<td>Tiger Nixon</td>
+						<td>System Architect</td>
+						<td>Edinburgh</td>
+						<td>61</td>
+						<td>2011/04/25</td>
+						<td>$320,800</td>
+					  </tr>
+					  <tr>
+						<td>Garrett Winters</td>
+						<td>Accountant</td>
+						<td>Tokyo</td>
+						<td>63</td>
+						<td>2011/07/25</td>
+						<td>$170,750</td>
+					  </tr>
+					  <tr>
+						<td>Gavin Joyce</td>
+						<td>Developer</td>
+						<td>Edinburgh</td>
+						<td>42</td>
+						<td>2010/12/22</td>
+						<td>$92,575</td>
+					  </tr>
+					  <tr>
+						<td>Jennifer Chang</td>
+						<td>Regional Director</td>
+						<td>Singapore</td>
+						<td>28</td>
+						<td>2010/11/14</td>
+						<td>$357,650</td>
+					  </tr>
+					  <tr>
+						<td>Brenden Wagner</td>
+						<td>Software Engineer</td>
+						<td>San Francisco</td>
+						<td>28</td>
+						<td>2011/06/07</td>
+						<td>$206,850</td>
+					  </tr>
+					  <tr>
+						<td>Fiona Green</td>
+						<td>Chief Operating Officer (COO)</td>
+						<td>San Francisco</td>
+						<td>48</td>
+						<td>2010/03/11</td>
+						<td>$850,000</td>
+					  </tr>
+					  <tr>
+						<td>Shou Itou</td>
+						<td>Regional Marketing</td>
+						<td>Tokyo</td>
+						<td>20</td>
+						<td>2011/08/14</td>
+						<td>$163,000</td>
+					  </tr>
+					  <tr>
+						<td>Michelle House</td>
+						<td>Integration Specialist</td>
+						<td>Sidney</td>
+						<td>37</td>
+						<td>2011/06/02</td>
+						<td>$95,400</td>
+					  </tr>
+					  <tr>
+						<td>Suki Burks</td>
+						<td>Developer</td>
+						<td>London</td>
+						<td>53</td>
+						<td>2009/10/22</td>
+						<td>$114,500</td>
+					  </tr>
+					  <tr>
+						<td>Prescott Bartlett</td>
+						<td>Technical Author</td>
+						<td>London</td>
+						<td>27</td>
+						<td>2011/05/07</td>
+						<td>$145,000</td>
+					  </tr>
+					  <tr>
+						<td>Gavin Cortez</td>
+						<td>Team Leader</td>
+						<td>San Francisco</td>
+						<td>22</td>
+						<td>2008/10/26</td>
+						<td>$235,500</td>
+					  </tr>
+					  <tr>
+						<td>Martena Mccray</td>
+						<td>Post-Sales support</td>
+						<td>Edinburgh</td>
+						<td>46</td>
+						<td>2011/03/09</td>
+						<td>$324,050</td>
+					  </tr>
+					  <tr>
+						<td>Unity Butler</td>
+						<td>Marketing Designer</td>
+						<td>San Francisco</td>
+						<td>47</td>
+						<td>2009/12/09</td>
+						<td>$85,675</td>
+					  </tr>
+					  <tr>
+						<td>Howard Hatfield</td>
+						<td>Office Manager</td>
+						<td>San Francisco</td>
+						<td>51</td>
+						<td>2008/12/16</td>
+						<td>$164,500</td>
+					  </tr>
+					  <tr>
+						<td>Hope Fuentes</td>
+						<td>Secretary</td>
+						<td>San Francisco</td>
+						<td>41</td>
+						<td>2010/02/12</td>
+						<td>$109,850</td>
+					  </tr>
+					  <tr>
+						<td>Vivian Harrell</td>
+						<td>Financial Controller</td>
+						<td>San Francisco</td>
+						<td>62</td>
+						<td>2009/02/14</td>
+						<td>$452,500</td>
+					  </tr>
+					  <tr>
+						<td>Timothy Mooney</td>
+						<td>Office Manager</td>
+						<td>London</td>
+						<td>37</td>
+						<td>2008/12/11</td>
+						<td>$136,200</td>
+					  </tr>
+					  <tr>
+						<td>Jackson Bradshaw</td>
+						<td>Director</td>
+						<td>New York</td>
+						<td>65</td>
+						<td>2008/09/26</td>
+						<td>$645,750</td>
+					  </tr>
+					  <tr>
+						<td>Olivia Liang</td>
+						<td>Support Engineer</td>
+						<td>Singapore</td>
+						<td>64</td>
+						<td>2011/02/03</td>
+						<td>$234,500</td>
+					  </tr>
+					  <tr>
+						<td>Bruno Nash</td>
+						<td>Software Engineer</td>
+						<td>London</td>
+						<td>38</td>
+						<td>2011/05/03</td>
+						<td>$163,500</td>
+					  </tr>
+					  <tr>
+						<td>Sakura Yamamoto</td>
+						<td>Support Engineer</td>
+						<td>Tokyo</td>
+						<td>37</td>
+						<td>2009/08/19</td>
+						<td>$139,575</td>
+					  </tr>
+					  <tr>
+						<td>Thor Walton</td>
+						<td>Developer</td>
+						<td>New York</td>
+						<td>61</td>
+						<td>2013/08/11</td>
+						<td>$98,540</td>
+					  </tr>
+					  <tr>
+						<td>Finn Camacho</td>
+						<td>Support Engineer</td>
+						<td>San Francisco</td>
+						<td>47</td>
+						<td>2009/07/07</td>
+						<td>$87,500</td>
+					  </tr>
+					  <tr>
+						<td>Serge Baldwin</td>
+						<td>Data Coordinator</td>
+						<td>Singapore</td>
+						<td>64</td>
+						<td>2012/04/09</td>
+						<td>$138,575</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</div>
+				<!--table end-->
+				
               </div>
             </div>
           </div>
         </div>
-        <!-- DataTables Example -->
+		
       </div>
       <!-- /.container-fluid -->
       <!-- Sticky Footer -->
@@ -134,23 +392,50 @@
   </a>
   <!-- Logout Modal-->
 
-  <script src="/js/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <!-- Core plugin JavaScript-->
-  <script src="/js/jquery-easing/jquery.easing.min.js"></script>
-  <!-- Page level plugin JavaScript-->
-  <script src="/js/chart.js/Chart.min.js"></script>
-  <script src="/js/datatables/jquery.dataTables.js"></script>
-  <script src="/js/datatables/dataTables.bootstrap4.js"></script>
-  <!-- Custom scripts for all pages-->
-  <script src="/js/sb-admin.min.js"></script>
-  <!-- Demo scripts for this page-->
-  <script src="/js/demo/datatables-demo.js"></script>
-  <!--<script src="/js/demo/chart-bar-demo.js"></script>-->
+  <!--동적스크립트라인-->
+  <script type="text/javascript">
+		var auth = $('#authComp').val();
+		if(auth == '1'){
+			var colorNames = Object.keys(window.chartColors);
+			$.get("/getActivity", function(data, status){
+				//alert("Data: " + data + "Status: " + status);
+				var jsonContent = JSON.parse(data);
+				
+				var colorName = colorNames[config.data.datasets.length % colorNames.length];
+				var newColor = window.chartColors[colorName];
+				var newDataset = {
+					label: '날짜별데이터',
+					backgroundColor: newColor,
+					borderColor: newColor,
+					data: [],
+					fill: false
+				};
+				
+				//라벨 x축 date
+				//데이터 y축 distance
+				for(var i=0; i<jsonContent.length; ++i){
+					config.data.labels.push(formatDate(jsonContent[i].start_date));
+					newDataset.data.push(convertDistance(jsonContent[i].distance));
+				}
+				
+				config.data.datasets.push(newDataset);
+				window.myLine.update();
+				
+			});
+			
+			$.get("/getAthlete", function(data, status){
+				//alert("Data: " + data + "Status: " + status);
+				var jsonContent = JSON.parse(data);
+			});
+		}else{
+			//...
+			
+		}
+   </script>
   
-  <!--chart유틸-->
-  <script src="/js/chart.js/utils.js"></script>
-  <!--개인기록차트-->
-  <script src="/js/index_chart.js"></script> 
+  <!--dynamicScriptLine-->
+  <div style="display:none">#dynamicScriptLine#</div>
+  <!--dynamicScriptLine-->
   
   <!--<pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>-->
 </body>

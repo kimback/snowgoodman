@@ -1,45 +1,25 @@
-
+	 
 //라인차트예제
-var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+//var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 var config = {
 	type: 'line',
 	data: {
-		labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-		datasets: [{
-			label: 'My First dataset',
-			backgroundColor: window.chartColors.red,
-			borderColor: window.chartColors.red,
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor()
-			],
-			fill: false,
-		}, {
-			label: 'My Second dataset',
-			fill: false,
-			backgroundColor: window.chartColors.blue,
-			borderColor: window.chartColors.blue,
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor()
-			],
-		}]
+		//labels: [],
+		//datasets: [{
+			//label: '',
+			//backgroundColor: window.chartColors.red,
+			//borderColor: window.chartColors.red,
+			//data: [
+				//...
+			//],
+			//fill: false,
+		//}]
 	},
 	options: {
 		responsive: true,
 		title: {
 			display: true,
-			text: 'Chart.js Line Chart'
+			text: '개인 기록 - 날짜별'
 		},
 		tooltips: {
 			mode: 'index',
@@ -54,17 +34,40 @@ var config = {
 				display: true,
 				scaleLabel: {
 					display: true,
-					labelString: 'Month'
+					labelString: '날짜'
 				}
 			}],
 			yAxes: [{
 				display: true,
 				scaleLabel: {
 					display: true,
-					labelString: 'Value'
+					labelString: '거리(km)'
 				}
 			}]
-		}
+		},
+		/*
+		tooltips: {
+		  callbacks: {
+			title: function(tooltipItem, data) {
+			  return data['labels'][tooltipItem[0]['index']];
+			},
+			label: function(tooltipItem, data) {
+			  return data['datasets'][0]['data'][tooltipItem['index']];
+			},
+			afterLabel: function(tooltipItem, data) {
+			  var dataset = data['datasets'][0];
+			  var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100)
+			  return '(' + percent + '%)';
+			}
+		  },
+		  backgroundColor: '#FFF',
+		  titleFontSize: 16,
+		  titleFontColor: '#0066ff',
+		  bodyFontColor: '#000',
+		  bodyFontSize: 14,
+		  displayColors: false
+		},*/
+		
 	}
 };
 window.onload = function() {
