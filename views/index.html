@@ -420,12 +420,21 @@
 				
 				config.data.datasets.push(newDataset);
 				window.myLine.update();
+							
+				$.get("/activityDataUpdating", {dataBody : jsonContent}, function(data, status){
+					alert(data);
+				});
+				
 				
 			});
 			
 			$.get("/getAthlete", function(data, status){
 				//alert("Data: " + data + "Status: " + status);
 				var jsonContent = JSON.parse(data);
+				
+				$.post("/athleteDataUpdating", jsonContent, function(data, status){
+					alert(data);
+				});
 			});
 		}else{
 			//...

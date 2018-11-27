@@ -6,6 +6,7 @@ var url = require('url');
 var express = require('express');
 var session = require('express-session');
 var querystring = require('querystring');
+var mysql = require('mysql');
 //---------------------------------------
 //---------------변수 및 사용관련-------------------
 var app = express();
@@ -14,6 +15,17 @@ var sess = '';
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
 
+
+ var connection = mysql.createConnection({
+        host: 'localhost',
+        post: 3306,
+        user: 'root',
+        password: '1q2w!!',
+        database: 'snowgoodman'
+    });
+    connection.connect();
+	
+	
 //세션객체생성
 app.use(session({
  secret: '@#@$MYSIGN#@$#$',
@@ -121,9 +133,25 @@ app.get('/getAthlete', function(req, res){
 	getAthleteData(req, res);
 });
 
+//---------------------- DB 컨트롤 -----------------------------------
+//활동 update
+app.get('/activityDataUpdating', function(req, res){
+	var databody = req.query.dataBody;
+	//console.log(req.query.dataBody[0]);
+	//var jsonContent = JSON.parse(req.query.dataBody);
+	//console.log(jsonContent.length);
+	
+	updateActivityData(req, res, databody);
+});
 
 
-//동적파일 서비스---------------------
+//운동선수 update
+app.get('/athleteDataUpdating', function(req, res){
+	//updateAthleteData(req, res);
+});
+
+
+//동적파일 서비스------------------------------------------------------------
 app.get('/actionIndex', function(req, res){
   //var lis = '';
   //for(var i = 0; i <5; i++){
@@ -269,6 +297,59 @@ function getAthleteData(req, res){
 	httpsRequest.end();//http call execute
 	
 }
+
+
+
+//활동db저장
+function updateActivityData(req, res, databody){	
+	
+	for(var i=0; i< databody.length; ++i){
+		var activityId = databody[i].id;
+		console.log(activityId);
+		var athleteId = databody[i].athlete.id;
+		var start_date = databody[i].start_date;
+		var distance = databody[i].distance;
+		var startLatlng = databody[i].start_latlng;
+		console.log(startLatlng);
+		var endLatlng = databody[i].end_latlng;
+		var type = databody[i].type;
+		var map = '';
+		var averageSpeed = databody[i].average_speed;
+		var maxSpeed = databody[i].max_speed;
+		var elev = '';
+		var calories = databody[i].calories;
+		
+		
+		var sql = 'insert into activity(activity_id, athlete_id, state_date, distance, start_latlng, end_latlng, type, map, average_speed, max_speed, elev, calories, etc) values(?)';
+		var values = [activityId, athleteId, start_date, distance, '', '', type, map, averageSpeed, maxSpeed, elev, calories, ''];
+		//['232','','','','','','','','','','','',''];
+	
+		
+		if (1 == 1) {
+			connection.query(sql, [values], function (err, rows, fields) {
+				if (!err) {
+					res.send('success');
+				} else {
+					res.send('err : ' + err);
+				}
+			});
+		}
+	}
+	
+}
+
+
+//운동선수db저장
+function updateAthleteData(req, res){
+	var httpsRequest = https.request(athleteOptions, function(response){//콜백
+		console.log('-------------운동선수db저장-----------');
+		handleResponse(response, req, res, 'dbUpdateAthlete');
+	});
+	httpsRequest.write('');
+	httpsRequest.end();//http call execute
+	
+}
+
 
 //핸들링
 function handleResponse(response, req, res, type) {
