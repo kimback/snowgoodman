@@ -97,23 +97,23 @@
     <!-- Sidebar -->
     <ul class="sidebar navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="/index">
+        <a class="nav-link" href="index.html">
           <i class="fas fa-fw fa-home"></i>
           <span>홈</span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/record">
+        <a class="nav-link" href="persnalRecode.html">
           <i class="fas fa-fw fa-edit"></i>
           <span>개인기록</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/rank">
+        <a class="nav-link" href="rank.html">
           <i class="fas fa-fw fa-list-alt"></i>
           <span>랭킹</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/club">
+        <a class="nav-link" href="#">
           <i class="fas fa-fw fa-cloud"></i>
           <span>클럽</span></a>
       </li>
@@ -396,9 +396,6 @@
   <script type="text/javascript">
 		var auth = $('#authComp').val();
 		if(auth == '1'){
-		
-			//데이터 받아서 db에 저장해야함
-		
 			var colorNames = Object.keys(window.chartColors);
 			$.get("/getActivity", function(data, status){
 				//alert("Data: " + data + "Status: " + status);
