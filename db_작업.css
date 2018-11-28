@@ -1,0 +1,26 @@
+
+
+
+use snowgoodman;
+select * from activity;
+select * from user;
+
+
+
+-- 거리랭킹
+
+SELECT MAX(A.distance) as dist, B.id, B.username, B.city, B.profile, B.clubs
+FROM activity A 
+LEFT OUTER JOIN user B
+ON A.athlete_id = B.id
+GROUP BY B.id, B.username
+ORDER BY MAX(A.distance) DESC
+LIMIT 10;
+
+
+
+-- 개인데이터
+SELECT activity_id, athlete_id, state_date, distance, type, average_speed, max_speed, elev, calories
+FROM activity
+WHERE athlete_id = '35991054';
+

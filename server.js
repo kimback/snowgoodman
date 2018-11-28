@@ -80,8 +80,24 @@ app.engine('html', require('ejs').renderFile);
 //--------------라우터---------------------
  //index
  app.get('/index',function(req,res){
-	res.render('index.html');
+	if(sess.userId != undefined && sess.userId != ''){
+		indexPageLoad(req, res);
+	}else{
+		res.render('index.html');
+	}
+	  
  });
+ 
+ //index
+ app.get('/myrecord',function(req,res){
+	if(sess.userId != undefined && sess.userId != ''){
+		recordPageLoad(req, res);
+	}else{
+		res.render('index.html');
+	}
+	  
+ });
+ 
  
 //인증1
 app.get('/*auth1result*', function(req, res){
@@ -125,7 +141,6 @@ app.get('/getActivity', function(req, res){
 //운동선수
 app.get('/getAthlete', function(req, res){
 	console.log('-------------getAthlete-----------');
-	//console.log('-------------sess.access_token-----------' + sess.access_token);
 	athleteOptions.headers.Authorization = 'Bearer ' + sess.access_token;
 	console.log(athleteOptions);
 	
@@ -133,91 +148,42 @@ app.get('/getAthlete', function(req, res){
 	getAthleteData(req, res);
 });
 
+
+
 //---------------------- DB 컨트롤 -----------------------------------
 //활동 update
 app.get('/activityDataUpdating', function(req, res){
 	var databody = req.query.dataBody;
-	//console.log(req.query.dataBody[0]);
-	//var jsonContent = JSON.parse(req.query.dataBody);
-	//console.log(jsonContent.length);
-	
 	updateActivityData(req, res, databody);
 });
 
 
 //운동선수 update
 app.get('/athleteDataUpdating', function(req, res){
-	//updateAthleteData(req, res);
+	var databody = req.query.dataBody;
+	updateAthleteData(req, res, databody);
+});
+
+//일단은 거리별 사용자별 토탈랭킹
+app.get('/getDistanceRank', function(req, res){
+	//var databody = req.query.dataBody;
+	getDistanceRankData(req, res);
 });
 
 
+app.get('/getMyRecordData',function(req,res){
+	getMyRecordData(req, res);
+});
+ 
+
 //동적파일 서비스------------------------------------------------------------
 app.get('/actionIndex', function(req, res){
-  //var lis = '';
-  //for(var i = 0; i <5; i++){
-      //lis += '<li>coding ' + i + '</li>';
-  //}
+  if(sess.userId != undefined && sess.userId != ''){
+	  indexPageLoad(req, res);
+  }else{
+	  res.render('index.html');
+  }
   
-  // 자바스크립트 새로운 표준 formatted text 기능
-  // ` `(grave accent) 사용을 통해서 JS에서 여려줄의 코드를 넣을 수 없는 문제를 해결
-  
-	var userId = sess.userId;
-	var userName = sess.userName;
-	var dynamicContent = '';
-	
-	fs.readFile('./views/index.html', function (err, data) {
-      if (err) {
-         console.log(err);
-      }else{
-		 console.log("200" + dynamicContent.toString());
-		 dynamicContent = data.toString();
-		 var output = dynamicContent.toString().replace('#userLine#', '<span>안녕하세요' + userId + '(' + userName + ')님</span>');
-		 var output2 = output.toString().replace('#authVal#', '1'
-		 /*
-		 `<script type="text/javascript">
-			var colorNames = Object.keys(window.chartColors);
-		 
-			$.get("/getActivity", function(data, status){
-				alert("Data: " + data + "Status: " + status);
-				var jsonContent = JSON.parse(data);
-				
-				var colorName = colorNames[config.data.datasets.length % colorNames.length];
-				var newColor = window.chartColors[colorName];
-				var newDataset = {
-					label: '날짜별데이터',
-					backgroundColor: newColor,
-					borderColor: newColor,
-					data: [],
-					fill: false
-				};
-				
-				//라벨 x축
-				for(var i=0; i<jsonContent.length; ++i){
-					config.data.labels.push(formatDate(jsonContent[i].start_date));
-				}
-				
-				//데이터 y축
-				for (var index = 0; index < config.data.labels.length; ++index) {
-					newDataset.data.push(randomScalingFactor());
-				}
-				config.data.datasets.push(newDataset);
-				window.myLine.update();
-				
-			});
-			
-			$.get("/getAthlete", function(data, status){
-				alert("Data: " + data + "Status: " + status);
-				var jsonContent = JSON.parse(data);
-			});
-		 </script>`
-		 */
-		 );
-		 res.send(output2);
-		 
-		 //체인성 작업 서버에서 진행
-		 //dataRefreshAndUpdate(req, res);
-      }
-   });
 	
 });
 //동적파일 서비스---------------------
@@ -227,6 +193,96 @@ app.get('/actionIndex', function(req, res){
 	
 
 //--------------------펑션---------------------------
+
+
+function commonHeaderControl(type, url, req, res){
+	
+	var userId = sess.userId;
+	var userName = sess.userName;
+	var profilePic = sess.profilePic;
+	var city = sess.city;
+	var sex = sess.sex;
+	var clubs = sess.clubs;
+		
+	var dynamicContent = '';
+	
+	fs.readFile(url, function (err, data) {
+      if (err) {
+         console.log(err);
+      }else{
+		 console.log("200" + dynamicContent.toString());
+		 dynamicContent = data.toString();
+		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:white !important">안녕하세요' + userId + '(' + userName + ')님</span>');
+		 var output2 = output.toString().replace('#authVal#', '1');
+		 
+		 if(type == 'myrecord'){
+			var totalstr = userId + '|';
+			totalstr += userName + '|';
+			totalstr += profilePic + '|';
+			totalstr += city + '|';
+			totalstr += sex + '|';
+			totalstr += clubs + '|';
+			
+			console.log(totalstr);
+		
+			output2 = output2.toString().replace('#profileVal#', totalstr);
+		 }
+		 	 
+		 res.send(output2);
+      }
+   });
+	
+}
+
+
+function indexPageLoad(req, res){
+	commonHeaderControl('index', './views/index.html', req, res);
+	// 자바스크립트 새로운 표준 formatted text 기능
+	// ` `(grave accent) 사용을 통해서 JS에서 여려줄의 코드를 넣을 수 없는 문제를 해결
+	/*
+	 `<script type="text/javascript">
+		var colorNames = Object.keys(window.chartColors);
+	 
+		$.get("/getActivity", function(data, status){
+			alert("Data: " + data + "Status: " + status);
+			var jsonContent = JSON.parse(data);
+			
+			var colorName = colorNames[config.data.datasets.length % colorNames.length];
+			var newColor = window.chartColors[colorName];
+			var newDataset = {
+				label: '날짜별데이터',
+				backgroundColor: newColor,
+				borderColor: newColor,
+				data: [],
+				fill: false
+			};
+			
+			//라벨 x축
+			for(var i=0; i<jsonContent.length; ++i){
+				config.data.labels.push(formatDate(jsonContent[i].start_date));
+			}
+			
+			//데이터 y축
+			for (var index = 0; index < config.data.labels.length; ++index) {
+				newDataset.data.push(randomScalingFactor());
+			}
+			config.data.datasets.push(newDataset);
+			window.myLine.update();
+			
+		});
+		
+		$.get("/getAthlete", function(data, status){
+			alert("Data: " + data + "Status: " + status);
+			var jsonContent = JSON.parse(data);
+		});
+	 </script>`
+	 */
+
+}
+
+function recordPageLoad(req, res){
+	commonHeaderControl('myrecord', './views/myrecord.html', req, res);
+}
 
 //인증2
 function requestAuth2(req, res, postData){
@@ -302,53 +358,126 @@ function getAthleteData(req, res){
 
 //활동db저장
 function updateActivityData(req, res, databody){	
-	
+	var msg = 'success';
 	for(var i=0; i< databody.length; ++i){
 		var activityId = databody[i].id;
-		console.log(activityId);
+		//console.log(activityId);
 		var athleteId = databody[i].athlete.id;
 		var start_date = databody[i].start_date;
 		var distance = databody[i].distance;
 		var startLatlng = databody[i].start_latlng;
-		console.log(startLatlng);
+		//console.log(startLatlng);
 		var endLatlng = databody[i].end_latlng;
 		var type = databody[i].type;
 		var map = '';
 		var averageSpeed = databody[i].average_speed;
 		var maxSpeed = databody[i].max_speed;
-		var elev = '';
+		var elev = databody[i].elev_high; //최고고도?
 		var calories = databody[i].calories;
 		
 		
 		var sql = 'insert into activity(activity_id, athlete_id, state_date, distance, start_latlng, end_latlng, type, map, average_speed, max_speed, elev, calories, etc) values(?)';
-		var values = [activityId, athleteId, start_date, distance, '', '', type, map, averageSpeed, maxSpeed, elev, calories, ''];
+		var values = [activityId, athleteId, start_date, distance, '', '', type, map, averageSpeed, maxSpeed, elev, calories, i];
 		//['232','','','','','','','','','','','',''];
 	
 		
 		if (1 == 1) {
 			connection.query(sql, [values], function (err, rows, fields) {
 				if (!err) {
-					res.send('success');
+					//res.send('success');
 				} else {
-					res.send('err : ' + err);
+					//res.send('err : ' + err);
+					msg += '업데이트실패 : ' + err;
 				}
 			});
 		}
 	}
-	
+	res.send(msg);
 }
 
 
 //운동선수db저장
-function updateAthleteData(req, res){
-	var httpsRequest = https.request(athleteOptions, function(response){//콜백
-		console.log('-------------운동선수db저장-----------');
-		handleResponse(response, req, res, 'dbUpdateAthlete');
-	});
-	httpsRequest.write('');
-	httpsRequest.end();//http call execute
+function updateAthleteData(req, res, databody){
+	var msg = 'success';
+	
+	//console.log(databody);
+	var id = databody.id;
+	var username = databody.username;
+	var firstname = databody.firstname;
+	var lastname = databody.lastname;
+	var city = databody.city;
+	var state = databody.state;
+	var sex = databody.sex;
+	var profile = databody.profile;
+	var clubs = databody.clubs;
+	var etc = '';
+	
+	
+	var sql = 'insert into user(id, username, firstname, lastname, city, state, sex, profile, clubs, etc) values(?)';
+	var values = [id, username, firstname, lastname, city, state, sex, profile, clubs, etc];
+
+	
+	if (1 == 1) {
+		connection.query(sql, [values], function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+			} else {
+				//res.send('err : ' + err);
+				msg += '업데이트실패 : ' + err;
+			}
+		});
+	}
+	res.send(msg);
 	
 }
+
+//거리별 사용자별 랭킹 조회
+function getDistanceRankData(req, res){
+
+	var sql = `SELECT MAX(A.distance) as dist, B.id, B.username, B.city, B.profile, B.clubs
+				FROM activity A 
+				LEFT OUTER JOIN user B
+				ON A.athlete_id = B.id
+				GROUP BY B.id, B.username
+				ORDER BY MAX(A.distance) DESC
+				LIMIT 10;`;
+	if (1 == 1) {
+		connection.query(sql, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('rows:' + rows);
+				res.send(rows);
+			} else {
+				res.send('err : ' + err);
+			}
+		});
+	}
+	
+}
+
+function getMyRecordData(req, res){
+	
+	var sql = `SELECT activity_id, athlete_id, state_date, distance, type, average_speed, max_speed, elev, calories
+				FROM activity
+				WHERE athlete_id = '?';`;
+				
+	var userId = sess.userId;
+					
+	if (1 == 1) {
+		connection.query(sql, userId, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('rows:' + rows);
+				res.send(rows);
+			} else {
+				res.send('err : ' + err);
+			}
+		});
+	}
+}
+
+
+
 
 
 //핸들링
@@ -376,6 +505,9 @@ function handleResponse(response, req, res, type) {
 		sess.userId = jsonContent.athlete.id;
 		sess.userName = jsonContent.athlete.username;
 		sess.profilePic = jsonContent.athlete.profile;
+		sess.city = jsonContent.athlete.profile;
+		sess.sex = jsonContent.athlete.sex;
+		sess.clubs = jsonContent.athlete.clubs;
 		
 		console.log(sess);
 		res.send('<h1>strava connected !</h1><script>window.location.replace("' + './actionIndex' + '");</script>');
