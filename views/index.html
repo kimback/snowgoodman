@@ -241,10 +241,13 @@
 				
 				//라벨 x축 date
 				//데이터 y축 distance
+				//key로 묶이는게 아니라 그냥 붙히는대로 다 나옴
 				for(var i=0; i<jsonContent.length; ++i){
 					config.data.labels.push(formatDate(jsonContent[i].start_date));
 					newDataset.data.push(convertDistance(jsonContent[i].distance));
 				}
+				//config.data.labels.push(formatDate(jsonContent[2].start_date));
+				//newDataset.data.push(convertDistance(jsonContent[2].distance + 100));
 				
 				config.data.datasets.push(newDataset);
 				window.myLine.update();

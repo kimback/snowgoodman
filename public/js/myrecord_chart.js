@@ -4,16 +4,8 @@
 var config = {
 	type: 'line',
 	data: {
-		//labels: [],
-		//datasets: [{
-			//label: '',
-			//backgroundColor: window.chartColors.red,
-			//borderColor: window.chartColors.red,
-			//data: [
-				//...
-			//],
-			//fill: false,
-		//}]
+		labels: [],
+		datasets: []
 	},
 	options: {
 		responsive: true,
@@ -70,10 +62,10 @@ var config = {
 		
 	}
 };
-window.onload = function() {
-	var ctx = document.getElementById('myLineChart').getContext('2d');
-	window.myLine = new Chart(ctx, config);
-};
+//window.onload = function() {
+//var ctx = document.getElementById('myLineChart').getContext('2d');
+//window.myLine = new Chart(ctx, config);
+//};
 
 /*
 document.getElementById('randomizeData').addEventListener('click', function() {
