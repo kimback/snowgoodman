@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-   <title> SNOWMAN V1.0 - [[[SNOWBOARD RIDING DATA ANALYSIS]]] </title>
+  <title> SNOWMAN V1.0 - [[[SNOWBOARD RIDING DATA ANALYSIS]]] </title>
   <!-- Bootstrap core CSS-->
   <link href="/js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom fonts for this template-->
@@ -37,6 +37,7 @@
   <script src="/js/chart.js/utils.js"></script>
   <!--개인기록차트-->
   <script src="/js/myrecord_chart.js"></script> 
+  
   
   <script type="text/javascript">
 
@@ -121,7 +122,7 @@
           <span>개인기록</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="rank.html">
+        <a class="nav-link" href="/rank">
           <i class="fas fa-fw fa-list-alt"></i>
           <span>랭킹</span></a>
       </li>
@@ -145,6 +146,14 @@
           <div class="card-body"> 사진/ 개인정보 화면구성 </div>
 		  <div id="profileView"></div>
         </div>
+		
+		<!-- pie Chart Example-->
+        <div class="card mb-3">
+          <div class="card-body">
+            <canvas id="myPieChart" width="100%" height="30"></canvas>
+          </div>
+        </div>
+		
         <!-- Chart Example-->
         <div class="card mb-3">
           <div class="card-header" contenteditable="true">
@@ -153,6 +162,7 @@
             <canvas id="myLineChart" width="100%" height="30"></canvas>
           </div>
         </div>
+		
         <!-- DataTables Example -->
         <div class="card mb-3">
           <div class="card-body">
@@ -178,12 +188,7 @@
             </div>
           </div>
         </div>
-        <!-- pie Chart Example-->
-        <div class="card mb-3">
-          <div class="card-body">
-            <canvas id="myPieChart" width="100%" height="30"></canvas>
-          </div>
-        </div>
+     
       </div>
       <!-- /.container-fluid -->
       <!-- Sticky Footer -->
@@ -206,7 +211,13 @@
 	
 	<!--동적스크립트라인-->
 	<script type="text/javascript">
-
+		
+		//파이차트
+		var ctxPie = document.getElementById('myPieChart');
+		var pieChart = new Chart(ctxPie, pieConfig);
+		//pieChart.update();
+	
+		//라인차트
 		var ctx = document.getElementById('myLineChart').getContext('2d');
 		window.myLine = new Chart(ctx, config);	
 		
@@ -216,11 +227,32 @@
 		
 			$('#stravaConnect').hide();
 			
+			//프로필 표시
 			var profileData = $('#profileData').val();
 			profileData.split('|');
 			//alert(profileData);
 			$('#profileView').append(profileData);
 			
+			
+			//파이차트 - 단순히 기록 데이터를 가지고 하기때문에 .. 거리등으로 썸해서 묶을 필요가 있음
+			$.get("/getWeekRecordData", function(data, status){
+				//alert(data);
+				var labelBuild = new Array();
+				var dataBuild = new Array();
+				
+				for(var i=0; i<data.length; i++){
+					labelBuild[i] = data[i].week; 
+					dataBuild[i] = data[i].weekcnt;
+					
+				}
+				
+				pieConfig.data.labels = labelBuild;
+				pieConfig.data.datasets[0].data = dataBuild;
+				pieChart.update();
+				
+			});
+						
+			//라인차트
 			$.get("/getMyRecordData", function(data, status){
 				var colorNames = Object.keys(window.chartColors);
 				var content = data;

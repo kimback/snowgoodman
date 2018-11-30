@@ -36,9 +36,10 @@
   <!--chart유틸-->
   <script src="/js/chart.js/utils.js"></script>
   <!--개인기록차트-->
-  <script src="/js/index_chart.js"></script> 
+  <script src="/js/rank_chart.js"></script> 
   
   <script type="text/javascript">
+
 	<!--개발클라이언트id사용-->
 	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
@@ -72,6 +73,16 @@
 		}
 		return result.toFixed(2);
 	}
+	
+	//스피드의 원값은 km/s 이다. 1km/s = 3600km/h
+	function convertSpeed(speed){
+		var result = 0;
+		if(speed > 0){
+			result = (speed / 3600) * 1000;
+		}
+	
+		return result.toFixed(1)
+	}
 
 	</script>
 </head>
@@ -86,7 +97,6 @@
     <!-- Navbar Search -->
     <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
       <div class="input-group">
-		
 		#userLine#
         <button id="stravaConnect" type="button" class="btn" 
 		style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
@@ -110,7 +120,7 @@
           <span>개인기록</span></a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="rank.html">
+        <a class="nav-link" href="/rank">
           <i class="fas fa-fw fa-list-alt"></i>
           <span>랭킹</span></a>
       </li>
@@ -133,19 +143,61 @@
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-list-alt"></i> 나의 랭킹</div>
-          <div class="card-body"> 현재까지의 나의 거리 ookm / 현재 oo 순위 </div>
+          <div class="card-body"><span id="myDistRank"></span></div>
         </div>
         <!-- DataTables Example -->
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-list-alt"></i> 총 랭킹</div>
-          <div class="card-body"> 랭킹 데이터 </div>
+          <div class="card-body"> 거리 랭킹 데이터 </div>
+		  
+		  <div>
+			<!--table start-->
+			<div class="table-responsive">
+			  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+				<thead>
+				  <tr>
+					<th>순위</th>
+					<th>아이디</th>
+					<th>거리</th>
+				  </tr>
+				</thead>
+				<tbody id="distRankBody">
+						  
+				</tbody>
+			  </table>
+			</div>
+			<!--table end-->
+		  </div>
+		  
+		  <div class="card-body"> 속도 랭킹 데이터 </div>
+		  
+		  <div>
+			<!--table start-->
+			<div class="table-responsive">
+			  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+				<thead>
+				  <tr>
+					<th>순위</th>
+					<th>아이디</th>
+					<th>속도</th>
+				  </tr>
+				</thead>
+				<tbody id="speedRankBody">
+						  
+				</tbody>
+			  </table>
+			</div>
+			<!--table end-->
+		  </div>
+		  
         </div>
         <!-- DataTables Example -->
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-list-alt"></i> 클럽 랭킹</div>
           <div class="card-body"> 랭킹 데이터 </div>
+		  <div>준비중...</div>
         </div>
       </div>
       <!-- /.container-fluid -->
@@ -167,6 +219,56 @@
   </a>
   <!-- Logout Modal-->
 
+	<!--동적스크립트라인-->
+	<script type="text/javascript">
+		$.get("/getMyRank", function(data, status){
+			//alert(data);
+			var dist = data[0];
+			var speed = data[1];
+			
+			var txtBuild = '<span>현재 나의 거리 ' + dist.dist;
+				txtBuild += '/' + dist.rk + '순위 </span><br/>';
+				txtBuild += '<span>현재 나의 최고속도 ' + speed.dist;
+				txtBuild += '/' + speed.rk + '순위 </span>';
+			
+			$('#myDistRank').append(txtBuild);
+		});
+		
+		$.get("/getTotalDistRank", function(data, status){
+			//alert(data);
+			var txtBuild = '';
+			
+			for(var i=0; i<data.length; i++){
+				txtBuild += '<tr>';
+						txtBuild += '<td>' + data[i].rk + '</td>'
+						txtBuild += '<td>' + data[i].athlete_id + '</td>'
+						txtBuild += '<td>' + data[i].dist + '</td>'
+					txtBuild += '</tr>'
+			}
+			$('#distRankBody').append(txtBuild);
+		
+		});
+		
+		
+		$.get("/getMaxSpeedRank", function(data, status){
+			//alert(data);
+			var txtBuild = '';
+			
+			for(var i=0; i<data.length; i++){
+				txtBuild += '<tr>';
+						txtBuild += '<td>' + data[i].rk + '</td>'
+						txtBuild += '<td>' + data[i].athlete_id + '</td>'
+						txtBuild += '<td>' + data[i].speed + '</td>'
+					txtBuild += '</tr>'
+			}
+			$('#speedRankBody').append(txtBuild);
+		
+		});
+		
+		
+	</script>
+	
+	
   <!--<pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>-->
 </body>
 

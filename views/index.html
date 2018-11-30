@@ -110,7 +110,7 @@
           <span>개인기록</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="rank.html">
+        <a class="nav-link" href="/rank">
           <i class="fas fa-fw fa-list-alt"></i>
           <span>랭킹</span></a>
       </li>
@@ -262,6 +262,7 @@
 		}
 		
 		function next2(){
+		    // 일자별 최고 거리 랭킹
 			var strHTML = '';
 			$.get("/getDistanceRank", function(data, status){
 				

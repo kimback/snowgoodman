@@ -88,7 +88,7 @@ app.engine('html', require('ejs').renderFile);
 	  
  });
  
- //index
+ //rank
  app.get('/myrecord',function(req,res){
 	if(sess.userId != undefined && sess.userId != ''){
 		recordPageLoad(req, res);
@@ -97,6 +97,18 @@ app.engine('html', require('ejs').renderFile);
 	}
 	  
  });
+ 
+ 
+  //index
+ app.get('/rank',function(req,res){
+	if(sess.userId != undefined && sess.userId != ''){
+		rankPageLoad(req, res);
+	}else{
+		res.render('index.html');
+	}
+	  
+ });
+ 
  
  
 //인증1
@@ -174,7 +186,28 @@ app.get('/getDistanceRank', function(req, res){
 app.get('/getMyRecordData',function(req,res){
 	getMyRecordData(req, res);
 });
- 
+
+
+app.get('/getMyRank',function(req,res){
+	getMyRankData(req, res);
+});
+
+
+app.get('/getTotalDistRank',function(req,res){
+	getTotalDistRank(req, res);
+});
+
+
+app.get('/getMaxSpeedRank',function(req,res){
+	getMaxSpeedRank(req, res);
+});
+
+
+app.get('/getWeekRecordData',function(req,res){
+	getWeekRecordData(req, res);
+});
+
+
 
 //동적파일 서비스------------------------------------------------------------
 app.get('/actionIndex', function(req, res){
@@ -282,6 +315,11 @@ function indexPageLoad(req, res){
 
 function recordPageLoad(req, res){
 	commonHeaderControl('myrecord', './views/myrecord.html', req, res);
+}
+
+
+function rankPageLoad(req, res){
+	commonHeaderControl('rank', './views/rank.html', req, res);
 }
 
 //인증2
@@ -477,6 +515,125 @@ function getMyRecordData(req, res){
 }
 
 
+
+function getMyRankData(req, res){
+	var whereVal = [sess.userId, sess.userId];
+	var sql = `(SELECT AA.*, '거리' as etc FROM
+				(select @rownum1:=@rownum1+1 as rk, b.* from
+				(select a.athlete_id, sum(a.distance*1) as dist
+				from activity a
+				group by a.athlete_id
+				) b, (select @rownum1:=0) TMP
+				order by b.dist desc) AA
+			where AA.athlete_id = '?')
+			union all
+			(select AA.*, '속도' as etc from
+				(select  @rownum2:=@rownum2+1 as rk, b.* from 
+				(select a.athlete_id, max(a.max_speed*1) as speed
+				from activity a
+				group by a.athlete_id
+				) b, (select @rownum2:=0) TMP
+				order by b.speed desc) AA
+			where AA.athlete_id = '?')`;
+			
+	if (1 == 1) {
+		connection.query(sql, whereVal, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('rows:' + rows);
+				res.send(rows);
+			} else {
+				res.send('err : ' + err);
+			}
+		});
+	}
+}
+
+
+function getTotalDistRank(req, res){
+	
+	var sql = `select @rownum:=@rownum+1 as rk, b.* from
+				(select a.athlete_id, sum(a.distance*1) as dist
+				from activity a
+				group by a.athlete_id
+				) b, (select @rownum:=0) TMP
+				order by b.dist desc
+				limit 20;`;
+				
+	var userId = sess.userId;
+					
+	if (1 == 1) {
+		connection.query(sql, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('rows:' + rows);
+				res.send(rows);
+			} else {
+				res.send('err : ' + err);
+			}
+		});
+	}
+	
+}
+
+function getMaxSpeedRank(req, res){
+	
+	var sql = `select  @rownum:=@rownum+1 as rk, b.* from 
+				(select a.athlete_id, max(a.max_speed*1) as speed
+				from activity a
+				group by a.athlete_id
+				) b, (select @rownum:=0) TMP
+				order by b.speed desc
+				limit 20;`;
+				
+	var userId = sess.userId;
+					
+	if (1 == 1) {
+		connection.query(sql, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('rows:' + rows);
+				res.send(rows);
+			} else {
+				res.send('err : ' + err);
+			}
+		});
+	}
+}
+
+
+function getWeekRecordData(req, res){
+	var userId = sess.userId;
+	var sql = `select count(AA.week) as weekcnt, AA.state_date, AA.week, AA.athlete_id
+				from
+					(SELECT state_date, DAYOFWEEK(state_date) AS week_n,
+					CASE DAYOFWEEK(state_date)
+						WHEN '1' THEN '일요일'
+						WHEN '2' THEN '월요일'
+						WHEN '3' THEN '화요일'
+						WHEN '4' THEN '수요일'
+						WHEN '5' THEN '목요일'
+						WHEN '6' THEN '금요일'
+						WHEN '7' THEN '토요일'
+					END AS week , athlete_id
+					FROM activity
+					WHERE athlete_id = '?') AA
+				group by AA.week
+				`;
+					
+	if (1 == 1) {
+		connection.query(sql, userId, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('rows:' + rows);
+				res.send(rows);
+			} else {
+				res.send('err : ' + err);
+			}
+		});
+	}
+	
+}
 
 
 

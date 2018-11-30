@@ -1,13 +1,11 @@
 
-
-
 use snowgoodman;
 select * from activity;
 select * from user;
 
 
 
--- 거리랭킹
+-- 일자별 최고 거리 랭킹
 
 SELECT MAX(A.distance) as dist, B.id, B.username, B.city, B.profile, B.clubs
 FROM activity A 
@@ -19,8 +17,123 @@ LIMIT 10;
 
 
 
+
 -- 개인데이터
 SELECT activity_id, athlete_id, state_date, distance, type, average_speed, max_speed, elev, calories
 FROM activity
 WHERE athlete_id = '35991054';
+
+
+
+
+
+
+
+
+select * from activity;
+
+select * from user where id = '35991054'
+
+
+
+
+-- set @rownum:=0;
+
+
+-- 개인별 누적거리랭킹
+
+select @rownum:=@rownum+1 as rk, b.* from
+(select a.athlete_id, sum(a.distance*1) as dist
+from activity a
+group by a.athlete_id
+) b, (select @rownum:=0) TMP
+order by b.dist desc
+limit 20;
+
+
+
+
+
+
+-- 개인 거리 랭킹확인
+(SELECT AA.*, '거리' as etc FROM
+	(select @rownum1:=@rownum1+1 as rk, b.* from
+	(select a.athlete_id, sum(a.distance*1) as dist
+	from activity a
+	group by a.athlete_id
+	) b, (select @rownum1:=0) TMP
+	order by b.dist desc) AA
+where AA.athlete_id = '1234567890987654321')
+
+union all
+
+-- 개인속도랭킹확인
+(select AA.*, '속도' as etc from
+	(select  @rownum2:=@rownum2+1 as rk, b.* from 
+	(select a.athlete_id, max(a.max_speed*1) as speed
+	from activity a
+	group by a.athlete_id
+	) b, (select @rownum2:=0) TMP
+	-- where b.athlete_id = '35991054'
+	order by b.speed desc) AA
+where AA.athlete_id = '1234567890987654321')
+
+
+
+
+-- 개인최고속도랭킹 
+
+select  @rownum:=@rownum+1 as rk, b.* from 
+(select a.athlete_id, max(a.max_speed*1) as speed
+from activity a
+group by a.athlete_id
+) b, (select @rownum:=0) TMP
+-- where b.athlete_id = '35991054'
+order by b.speed desc;
+
+
+
+
+-- 개인속도랭킹확인
+select AA.* from
+	(select  @rownum:=@rownum+1 as rk, b.* from 
+	(select a.athlete_id, max(a.max_speed*1) as speed
+	from activity a
+	group by a.athlete_id
+	) b, (select @rownum:=0) TMP
+	-- where b.athlete_id = '35991054'
+	order by b.speed desc) AA
+where AA.athlete_id = '1234567890987654321'
+
+
+
+
+-- 요일별 데이터(파이)
+
+select count(AA.week) as weekcnt, AA.*
+from
+	(SELECT state_date, DAYOFWEEK(state_date) AS week_n,
+	CASE DAYOFWEEK(state_date)
+		WHEN '1' THEN '일요일'
+		WHEN '2' THEN '월요일'
+		WHEN '3' THEN '화요일'
+		WHEN '4' THEN '수요일'
+		WHEN '5' THEN '목요일'
+		WHEN '6' THEN '금요일'
+		WHEN '7' THEN '토요일'
+	END AS week , athlete_id
+	FROM activity
+	WHERE athlete_id = '35991054') AA
+group by AA.week
+
+
+
+
+
+
+
+
+
+
+
 
