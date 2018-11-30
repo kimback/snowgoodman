@@ -1,0 +1,38 @@
+
+use snowgoodman;
+
+
+select * from activity;
+
+select * from user where id = '35991054'
+
+
+
+
+set @rownum:=0;
+
+
+-- 누적 거리 랭킹
+
+select  @rownum:=@rownum+1, b.* from 
+(select a.athlete_id, sum(a.distance*1) as dist
+from activity a
+group by a.athlete_id
+) b, (select @rownum:=0) TMP
+-- where b.athlete_id = '35991054'
+order by b.dist desc;
+
+
+
+
+-- 개인최고속도 랭킹
+
+select  @rownum:=@rownum+1, b.* from 
+(select a.athlete_id, max(a.max_speed*1) as speed
+from activity a
+group by a.athlete_id
+) b, (select @rownum:=0) TMP
+-- where b.athlete_id = '35991054'
+order by b.speed desc;
+
+
