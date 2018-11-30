@@ -143,8 +143,18 @@
         <!-- Icon Cards-->
         <!-- sample personel -->
         <div class="card mb-3">
-          <div class="card-body"> 사진/ 개인정보 화면구성 </div>
-		  <div id="profileView"></div>
+          <div class="card-body"> 
+			<div class="list-group">
+			  <a href="#" class="list-group-item list-group-item-success">
+				사진/ 개인정보 화면구성
+			  </a>
+			  <a href="#" class="list-group-item" id="profile"><img src="" id="listProfileImg" class="img-circle" alt="Cinque Terre" style="width=100px; height:100px; border-radius:10%;"></a>
+			  <a href="#" class="list-group-item" id="name"></a>
+			  <a href="#" class="list-group-item" id="sex"></a>
+			  <a href="#" class="list-group-item" id="city"></a>
+			  <a href="#" class="list-group-item" id="rank">현재 00km / 00위</a>
+			</div>
+		   </div>
         </div>
 		
 		<!-- pie Chart Example-->
@@ -229,9 +239,14 @@
 			
 			//프로필 표시
 			var profileData = $('#profileData').val();
-			profileData.split('|');
+			var profileArray = profileData.split('|');
 			//alert(profileData);
-			$('#profileView').append(profileData);
+			//$('#profileView').append(profileData);
+			$('#listProfileImg').attr("src", profileArray[2]);
+			$('#name').html(profileArray[1]);
+			$('#sex').html(profileArray[4]);
+			$('#city').html(profileArray[5]);
+			//$('#rank').append = '';
 			
 			
 			//파이차트 - 단순히 기록 데이터를 가지고 하기때문에 .. 거리등으로 썸해서 묶을 필요가 있음
