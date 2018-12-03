@@ -45,9 +45,18 @@
 	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 	$(function(){
+
 		$('#stravaConnect').click(function(){
 		  requestUserAuth();
 		});
+		
+		$('#dataTable1').DataTable({
+			"paging": false, // false to disable pagination (or any other option)
+			"searching" : false,
+			"info" : false,
+			"sort" : false,
+		  });
+		
 	});
 	
 	function requestUserAuth(){
@@ -83,6 +92,14 @@
 		}
 	
 		return result.toFixed(1)
+	}
+	
+	function nullValid(content){
+		var result = content;
+		if(result == undefined || result == 'undefined' || result === 'null' || result === 'NULL'){
+			result = '';
+		}
+		return result;
 	}
 
 	</script>
@@ -177,15 +194,15 @@
         <div class="card mb-3">
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+              <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
                 <thead>
                   <tr>
-                    <th>아이디</th>
+                    <!--<th>아이디</th>-->
                     <th>날짜</th>
-                    <th>거리</th>
+                    <th>거리(km)</th>
                     <th>타입</th>
-                    <th>평균속도</th>
-                    <th>최고속도</th>
+                    <th>평균속도(km/h)</th>
+                    <th>최고속도(km/h)</th>
 					<th>고도</th>
 					<th>칼로리</th>
 					
@@ -242,10 +259,10 @@
 			var profileArray = profileData.split('|');
 			//alert(profileData);
 			//$('#profileView').append(profileData);
-			$('#listProfileImg').attr("src", profileArray[2]);
-			$('#name').html(profileArray[1]);
-			$('#sex').html(profileArray[4]);
-			$('#city').html(profileArray[5]);
+			$('#listProfileImg').attr("src", nullValid(profileArray[2]));
+			$('#name').html(nullValid(profileArray[1]));
+			$('#sex').html(nullValid(profileArray[4]));
+			$('#city').html(nullValid(profileArray[5]));
 			//$('#rank').append = '';
 			
 			
@@ -288,6 +305,7 @@
 					fill: false
 				};
 				
+				/*
 				var newDataset3 = {
 					label: '고도',
 					backgroundColor: 'green',
@@ -295,7 +313,9 @@
 					data: [],
 					fill: false
 				};
+				*/
 				
+				/*
 				var newDataset4 = {
 					label: '칼로리',
 					backgroundColor: 'blue',
@@ -303,6 +323,7 @@
 					data: [],
 					fill: false
 				};
+				*/
 				
 				var strHTML = '';
 				
@@ -322,26 +343,26 @@
 					config.data.labels.push(formatDate(startDate)); //state 오타 = stratdate
 					newDataset1.data.push(convertDistance(dist)); //거리
 					newDataset2.data.push(convertSpeed(maxSpeed)); //속도
-					newDataset3.data.push(elev); //고도
-					newDataset4.data.push(calories); //칼로리
+					//newDataset3.data.push(elev); //고도
+					//newDataset4.data.push(calories); //칼로리
 								
 					strHTML += '<tr>';
-						strHTML += '<td>' + userId + '</td>'
-						strHTML += '<td>' + startDate + '</td>'
-						strHTML += '<td>' + dist + '</td>'
-						strHTML += '<td>' + type + '</td>'
-						strHTML += '<td>' + convertSpeed(averageSpeed) + '</td>'
-						strHTML += '<td>' + convertSpeed(maxSpeed) + '</td>'
-						strHTML += '<td>' + elev + '</td>'
-						strHTML += '<td>' + calories + '</td>'
+						//strHTML += '<td>' + nullValid(userId) + '</td>'
+						strHTML += '<td>' + nullValid(formatDate(startDate)) + '</td>'
+						strHTML += '<td>' + nullValid(convertDistance(dist)) + '</td>'
+						strHTML += '<td>' + nullValid(type) + '</td>'
+						strHTML += '<td>' + nullValid(convertSpeed(averageSpeed)) + '</td>'
+						strHTML += '<td>' + nullValid(convertSpeed(maxSpeed)) + '</td>'
+						strHTML += '<td>' + nullValid(elev) + '</td>'
+						strHTML += '<td>' + nullValid(calories) + '</td>'
 					strHTML += '</tr>'		
 					
 				}
 								
 				config.data.datasets.push(newDataset1);
 				config.data.datasets.push(newDataset2);
-				config.data.datasets.push(newDataset3);
-				config.data.datasets.push(newDataset4);
+				//config.data.datasets.push(newDataset3);
+				//config.data.datasets.push(newDataset4);
 				window.myLine.update();
 				
 				$("#privateDataBody").html(strHTML);	

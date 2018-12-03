@@ -40,12 +40,23 @@
   
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
+	//배포용
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//개발용
 	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 	$(function(){
 		$('#stravaConnect').click(function(){
 		  requestUserAuth();
 		});
+		
+		$('#dataTable1').DataTable({
+			"paging": false, // false to disable pagination (or any other option)
+			"searching" : false,
+			"info" : false,
+			"sort" : false,
+		  });
+		  	
 	});
 	
 	function requestUserAuth(){
@@ -72,6 +83,16 @@
 		}
 		return result.toFixed(2);
 	}
+	
+	
+	function nullValid(content){
+		var result = content;
+		if(result == undefined || result == 'undefined' || result === 'null' || result === 'NULL'){
+			result = '';
+		}
+		return result;
+	}
+
 
 	</script>
 	
@@ -87,7 +108,6 @@
     <!-- Navbar Search -->
     <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
       <div class="input-group">
-		
 		#userLine#
         <button id="stravaConnect" type="button" class="btn" 
 		style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
@@ -147,25 +167,16 @@
                 <!--<canvas id="myAreaChart" width="100%" height="30"></canvas>-->
 				<!--table start-->
 				<div class="table-responsive">
-				  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+				  <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
 					<thead>
 					  <tr>
-						<th>name</th>
-						<th>distance</th>
-						<th>city</th>
-						<th>profile</th>
-						<th>club</th>
+						<th>이름</th>
+						<th>거리(km)</th>
+						<th>지역</th>
+						<th>프로필</th>
+						<th>클럽</th>
 					  </tr>
 					</thead>
-					<tfoot>
-					  <tr>
-						<th>name</th>
-						<th>distance</th>
-						<th>city</th>
-						<th>profile</th>
-						<th>club</th>
-					  </tr>
-					</tfoot>
 					<tbody id="distRankBody">
 					  					  
 					</tbody>
@@ -263,6 +274,7 @@
 		
 		function next2(){
 		    // 일자별 최고 거리 랭킹
+			var color = ['#FFC19E','#FFE08C','#FAED7D','#CEF279','#B7F0B1', '#B2EBF4', '#B2CCFF'];
 			var strHTML = '';
 			$.get("/getDistanceRank", function(data, status){
 				
@@ -275,12 +287,16 @@
 					var profile = data[i].profile;
 					var clubs = data[i].clubs;
 					
-					strHTML += '<tr>';
-						strHTML += '<td>' + username + '</td>'
-						strHTML += '<td>' + dist + '</td>'
-						strHTML += '<td>' + city + '</td>'
-						strHTML += '<td>' + 'profile' + '</td>'
-						strHTML += '<td>' + clubs + '</td>'
+					var colorNum = 0;
+					if(i > 0){
+						colorNum = i % colorNum.length;
+					}
+					strHTML += '<tr style="background:' + color[colorNum] +'">';
+						strHTML += '<td>' + nullValid(username) + '</td>'
+						strHTML += '<td>' + nullValid(convertDistance(dist)) + '</td>'
+						strHTML += '<td>' + nullValid(city) + '</td>'
+						strHTML += '<td>' + '<img src="' + nullValid(profile) + '" id="profile_rank" class="img-circle" alt="Cinque Terre" style="width=30px; height:30px; border-radius:10%;"/>' + '</td>'
+						strHTML += '<td>' + nullValid(clubs) + '</td>'
 					strHTML += '</tr>'
 				}
 				

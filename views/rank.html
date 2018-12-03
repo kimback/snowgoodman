@@ -98,6 +98,16 @@
 	
 		return result.toFixed(1)
 	}
+	
+	
+	function nullValid(content){
+		var result = content;
+		if(result == undefined || result == 'undefined' || result === 'null' || result === 'NULL'){
+			result = '';
+		}
+		return result;
+	}
+
 
 	</script>
 </head>
@@ -167,7 +177,7 @@
           
 		    <div class="card-body"> 거리 랭킹 데이터 </div>
 			<!--table start-->
-			<div class="table-responsive">
+			<div style="margin-left: 10px; margin-right:10px;">
 			  <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
 				<thead>
 				  <tr>
@@ -185,7 +195,7 @@
 		  
 			<div class="card-body"> 속도 랭킹 데이터 </div>
 			<!--table start-->
-			<div class="table-responsive">
+			<div style="margin-left: 10px; margin-right:10px;">
 			  <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0">
 				<thead>
 				  <tr>
@@ -206,8 +216,7 @@
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-list-alt"></i> 클럽 랭킹</div>
-          <div class="card-body"> 랭킹 데이터 </div>
-		  <div>준비중...</div>
+          <div class="card-body"> 랭킹 데이터 준비중 ... </div>
         </div>
       </div>
       <!-- /.container-fluid -->
@@ -238,9 +247,9 @@
 			var dist = data[0];
 			var speed = data[1];
 			
-			var txtBuild = '<span>현재 나의 거리 ' + dist.dist;
+			var txtBuild = '<span>현재 나의 거리(km) ' + convertDistance(dist.dist);
 				txtBuild += '/' + dist.rk + '순위 </span><br/>';
-				txtBuild += '<span>현재 나의 최고속도 ' + speed.dist;
+				txtBuild += '<span>현재 나의 최고속도(km/h) ' + convertSpeed(speed.dist);
 				txtBuild += '/' + speed.rk + '순위 </span>';
 			
 			$('#myDistRank').append(txtBuild);

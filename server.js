@@ -1,3 +1,15 @@
+
+//v.1.0
+
+
+//----------------------------------------
+//---------배포/개발용 구분--------------------
+//1. mysql 커넥션
+//2. 주소사용부분은 호스팅 도메인으로 변경 (view페이지도)
+//3. 경로 못잡는 문제로사용
+//app.set('views', __dirname + '/views');
+//app.set('public', __dirname + '/public');
+
 //---------------모듈정의--------------------
 var http = require('http');
 var https = require('https');
@@ -15,7 +27,19 @@ var sess = '';
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
 
+//배포용
+/*
+var connection = initializeConnection({
+    host: '10.0.0.1',
+	post: 3306,
+	user: 'snowgoodman',
+	password: 'snowman157248!',
+	database: 'snowgoodman'
+});
+*/
 
+
+//개발용
  var connection = mysql.createConnection({
         host: 'localhost',
         post: 3306,
@@ -23,8 +47,36 @@ app.use(express.static(__dirname + '/views'));
         password: '1q2w!!',
         database: 'snowgoodman'
     });
+connection.connect();
+
+
+//배포시 커넥션 끊어지는 문제로 추가
+function initializeConnection(config) {
+    function addDisconnectHandler(connection) {
+        connection.on("error", function (error) {
+            if (error instanceof Error) {
+                if (error.code === "PROTOCOL_CONNECTION_LOST") {
+                    console.error(error.stack);
+                    console.log("Lost connection. Reconnecting...");
+
+                    initializeConnection(connection.config);
+                } else if (error.fatal) {
+                    throw error;
+                }
+            }
+        });
+    }
+
+    var connection = mysql.createConnection(config);
+
+    // Add handlers.
+    addDisconnectHandler(connection);
+
     connection.connect();
-	
+    return connection;
+}
+
+
 	
 //세션객체생성
 app.use(session({
@@ -71,6 +123,8 @@ var activityOptions = {
 //라우터 및 뷰 엔진설정
 //var router = require('./router/main')(app, querystring);
 app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+app.set('public', __dirname + '/public');
 app.engine('html', require('ejs').renderFile);
 
    
@@ -83,7 +137,7 @@ app.engine('html', require('ejs').renderFile);
 	if(sess.userId != undefined && sess.userId != ''){
 		indexPageLoad(req, res);
 	}else{
-		res.render('index.html');
+		res.render('index.html'); 
 	}
 	  
  });
@@ -245,7 +299,7 @@ function commonHeaderControl(type, url, req, res){
       }else{
 		 console.log("200" + dynamicContent.toString());
 		 dynamicContent = data.toString();
-		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:white !important">안녕하세요' + userId + '(' + userName + ')님</span>');
+		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:white !important; margin-left:12px; margin-top:12px;">안녕하세요' + userId + '(' + userName + ')님</span>');
 		 var output2 = output.toString().replace('#authVal#', '1');
 		 
 		 if(type == 'myrecord'){
@@ -269,7 +323,7 @@ function commonHeaderControl(type, url, req, res){
 
 
 function indexPageLoad(req, res){
-	commonHeaderControl('index', './views/index.html', req, res);
+	commonHeaderControl('index', __dirname + '/views/index.html', req, res);
 	// 자바스크립트 새로운 표준 formatted text 기능
 	// ` `(grave accent) 사용을 통해서 JS에서 여려줄의 코드를 넣을 수 없는 문제를 해결
 	/*
@@ -314,12 +368,12 @@ function indexPageLoad(req, res){
 }
 
 function recordPageLoad(req, res){
-	commonHeaderControl('myrecord', './views/myrecord.html', req, res);
+	commonHeaderControl('myrecord', __dirname + '/views/myrecord.html', req, res);
 }
 
 
 function rankPageLoad(req, res){
-	commonHeaderControl('rank', './views/rank.html', req, res);
+	commonHeaderControl('rank', __dirname + '/views/rank.html', req, res);
 }
 
 //인증2
@@ -423,9 +477,11 @@ function updateActivityData(req, res, databody){
 			connection.query(sql, [values], function (err, rows, fields) {
 				if (!err) {
 					//res.send('success');
+					console.log('updateActivityData ------- success');
 				} else {
 					//res.send('err : ' + err);
 					msg += '업데이트실패 : ' + err;
+					console.log('updateActivityData ------- err : ' + err);
 				}
 			});
 		}
@@ -458,10 +514,12 @@ function updateAthleteData(req, res, databody){
 	if (1 == 1) {
 		connection.query(sql, [values], function (err, rows, fields) {
 			if (!err) {
+				console.log('updateAthleteData ------- success');
 				//res.send('success');
 			} else {
 				//res.send('err : ' + err);
 				msg += '업데이트실패 : ' + err;
+				console.log('updateAthleteData ------- err : ' + err);
 			}
 		});
 	}
@@ -482,10 +540,11 @@ function getDistanceRankData(req, res){
 	if (1 == 1) {
 		connection.query(sql, function (err, rows, fields) {
 			if (!err) {
+				console.log('getDistanceRankData ------- success');
 				//res.send('success');
-				console.log('rows:' + rows);
 				res.send(rows);
 			} else {
+				console.log('getDistanceRankData ------- err : ' + err);
 				res.send('err : ' + err);
 			}
 		});
@@ -505,10 +564,11 @@ function getMyRecordData(req, res){
 		connection.query(sql, userId, function (err, rows, fields) {
 			if (!err) {
 				//res.send('success');
-				console.log('rows:' + rows);
+				console.log('getMyRecordData ------- success');
 				res.send(rows);
 			} else {
 				res.send('err : ' + err);
+				console.log('getMyRecordData ------- err : ' + err);
 			}
 		});
 	}
@@ -539,8 +599,7 @@ function getMyRankData(req, res){
 	if (1 == 1) {
 		connection.query(sql, whereVal, function (err, rows, fields) {
 			if (!err) {
-				//res.send('success');
-				console.log('rows:' + rows);
+				console.log('getMyRankData ------- success');
 				res.send(rows);
 			} else {
 				res.send('err : ' + err);
@@ -566,7 +625,7 @@ function getTotalDistRank(req, res){
 		connection.query(sql, function (err, rows, fields) {
 			if (!err) {
 				//res.send('success');
-				console.log('rows:' + rows);
+				console.log('getTotalDistRank ------- success');
 				res.send(rows);
 			} else {
 				res.send('err : ' + err);
@@ -592,10 +651,11 @@ function getMaxSpeedRank(req, res){
 		connection.query(sql, function (err, rows, fields) {
 			if (!err) {
 				//res.send('success');
-				console.log('rows:' + rows);
+				console.log('getMaxSpeedRank ------- success');
 				res.send(rows);
 			} else {
 				res.send('err : ' + err);
+				console.log('getMaxSpeedRank err ------- err');
 			}
 		});
 	}
@@ -625,10 +685,11 @@ function getWeekRecordData(req, res){
 		connection.query(sql, userId, function (err, rows, fields) {
 			if (!err) {
 				//res.send('success');
-				console.log('rows:' + rows);
+				console.log('getWeekRecordData ------- success');
 				res.send(rows);
 			} else {
 				res.send('err : ' + err);
+				console.log('getWeekRecordData err ------- err');
 			}
 		});
 	}
@@ -687,6 +748,8 @@ function handleResponse(response, req, res, type) {
 
 //-----------------------------------------------
 
-var server = app.listen(8080, function(){
-    console.log("Express server has started on port 8080")
+//var server = app.listen(8080, function(){
+var server = app.listen(8001, function(){
+
+	    console.log("Express server has started on port 8001")
 });
