@@ -105,15 +105,7 @@
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
     </button>
-    <!-- Navbar Search -->
-    <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
-      <div class="input-group">
-		#userLine#
-        <button id="stravaConnect" type="button" class="btn" 
-		style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
-      </div>
-    </form>
-    <!-- Navbar -->
+	
   </nav>
   <div id="wrapper">
     <!-- Sidebar -->
@@ -142,6 +134,21 @@
     </ul>
     <div id="content-wrapper">
       <div class="container-fluid">
+		<ol class="breadcrumb">
+          <li class="breadcrumb-item">
+			<!-- Navbar Search -->
+			<h7 name="stravaConnect">스트라바와 연동하면 자신의 라이딩 데이터를 분석 할 수 있습니다.</h7>
+			<form class="d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+			  <div class="input-group">
+				<span id="userProfile" style="display:none;">#userLine#</span>
+				<button name="stravaConnect" type="button" class="btn" 
+				style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
+			  </div>
+			</form>
+			<!-- Navbar -->
+          </li>
+        </ol>
+		
         <!-- Breadcrumbs-->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
@@ -151,11 +158,12 @@
         <!-- Icon Cards-->
 		
         <!-- Chart Example-->
-        <div class="card mb-3">
-          <div class="card-header" contenteditable="true">
-            <i class="fas fa-chart-area"></i>&nbsp;개인기록</div>
-          <div class="card-body">
-            <canvas id="myLineChart" width="100%" height="30"></canvas>
+        <div class="card mb-3" style="height: 300px;">
+            <div class="card-header" contenteditable="true">
+            <i class="fas fa-chart-area"></i>&nbsp;개인기록
+			</div>
+          <div class="chart-container" style="position: relative; height:100%; width:100%;">
+            <canvas id="myLineChart"></canvas>
           </div>
         </div>
         <div class="row">
@@ -167,7 +175,7 @@
                 <!--<canvas id="myAreaChart" width="100%" height="30"></canvas>-->
 				<!--table start-->
 				<div class="table-responsive">
-				  <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+				  <table class="table table-bordered" id="dataTable1">
 					<thead>
 					  <tr>
 						<th>이름</th>
@@ -218,6 +226,7 @@
 		var auth = $('#authComp').val();
 		if(auth == '1'){ //인증됬다는 플래그
 			$('#stravaConnect').hide();
+			$('#userProfile').show();
 			var colorNames = Object.keys(window.chartColors);
 			//사람을 먼저 넣고
 			$.get("/getAthlete", function(data, status){

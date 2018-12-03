@@ -748,8 +748,10 @@ function handleResponse(response, req, res, type) {
 
 //-----------------------------------------------
 
-//var server = app.listen(8080, function(){
-var server = app.listen(8001, function(){
+//개발용 
+var server = app.listen(8080, function(){
+// 배포용 
+//var server = app.listen(8001, function(){
 
-	    console.log("Express server has started on port 8001")
+	    console.log("------- server has started on port 8008 --------")
 });

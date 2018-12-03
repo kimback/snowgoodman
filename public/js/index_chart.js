@@ -27,6 +27,10 @@ var config = {
 				scaleLabel: {
 					display: true,
 					labelString: '날짜'
+				},
+				ticks: {
+				  beginAtZero: true,
+				  padding: 0,
 				}
 			}],
 			yAxes: [{
@@ -34,9 +38,14 @@ var config = {
 				scaleLabel: {
 					display: true,
 					labelString: '거리(km)'
+				},
+				ticks: {
+				  beginAtZero: true,
+				  padding: 0,
 				}
 			}]
 		},
+		maintainAspectRatio: false,
 		/*
 		tooltips: {
 		  callbacks: {
