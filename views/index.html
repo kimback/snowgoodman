@@ -46,10 +46,23 @@
 	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 	$(function(){
+		//연결요청
 		$('#stravaConnect').click(function(){
-		  requestUserAuth();
+			requestUserAuth();
 		});
 		
+		//로딩바토글
+		$('#sidebarToggle').click(function(){
+			var disp = $('.sidebar').css('display');
+			if(disp === 'none'){
+				$('.sidebar').show();
+			}else{
+				$('.sidebar').hide();
+			}
+			
+		});
+		
+		//테이블 셋팅
 		$('#dataTable1').DataTable({
 			"paging": false, // false to disable pagination (or any other option)
 			"searching" : false,
@@ -59,6 +72,7 @@
 		  	
 	});
 	
+	//요청인증
 	function requestUserAuth(){
 		window.location.replace(authUrl);
 	}
@@ -76,6 +90,7 @@
 		return [year, month, day].join('-');
 	}
 	
+	//거리 변환
 	function convertDistance(distance){
 		var result = 0;
 		if(distance > 0){
@@ -84,7 +99,7 @@
 		return result.toFixed(2);
 	}
 	
-	
+	//널체크
 	function nullValid(content){
 		var result = content;
 		if(result == undefined || result == 'undefined' || result === 'null' || result === 'NULL'){
@@ -92,16 +107,102 @@
 		}
 		return result;
 	}
+	
+	//로딩바
+	function loadingBarToggle(type){
+		
+		if(type === '1'){
+			//오래걸리는 작업 시작 로딩바 
+			$('#loader').show();
+			//일다하고 화면 띄우기
+			$('#contentBody').hide();
+		}else{
+						//오래걸리는 작업 시작 로딩바 
+			$('#loader').hide();
+
+			//일다하고 화면 띄우기
+			$('#contentBody').show();
+
+		}
+	
+	}
 
 
 	</script>
 	
+	<style type="text/css">
+			/*@media screen and (max-width: 400px) {
+                body { background-color: red; }
+                h1 { color: white; }
+            }
+            @media screen and (min-width: 401px) and (max-width: 500px) {
+                body { background-color: green; }
+                h1 { color: red; }
+            }*/
+            @media screen and (max-width: 600px) {
+               .sidebar{
+               		display:none;
+               }
+            }
+ 
+	</style>
+	
+	<style>
+		/* Center the loader */
+		#loader {
+		  position: absolute;
+		  left: 50%;
+		  top: 50%;
+		  z-index: 1;
+		  margin: -75px 0 0 -75px;
+		  border: 16px solid #f3f3f3;
+		  border-radius: 50%;
+		  border-top: 16px solid #3498db;
+		  width: 120px;
+		  height: 120px;
+		  -webkit-animation: spin 2s linear infinite;
+		  animation: spin 2s linear infinite;
+		  display: none;
+		}
+
+		@-webkit-keyframes spin {
+		  0% { -webkit-transform: rotate(0deg); }
+		  100% { -webkit-transform: rotate(360deg); }
+		}
+
+		@keyframes spin {
+		  0% { transform: rotate(0deg); }
+		  100% { transform: rotate(360deg); }
+		}
+
+		/* Add animation to "page content" */
+		.animate-bottom {
+		  position: relative;
+		  -webkit-animation-name: animatebottom;
+		  -webkit-animation-duration: 1s;
+		  animation-name: animatebottom;
+		  animation-duration: 1s
+		}
+
+		@-webkit-keyframes animatebottom {
+		  from { bottom:-100px; opacity:0 } 
+		  to { bottom:0px; opacity:1 }
+		}
+
+		@keyframes animatebottom { 
+		  from{ bottom:-100px; opacity:0 } 
+		  to{ bottom:0; opacity:1 }
+		}
+
+	</style>
+
 </head>
 
 <body id="page-top">
+<div id="contentBody">
   <input type="hidden" id="authComp" value="#authVal#"/>
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-    <a class="navbar-brand mr-1" href="index.html">S n O w M a N</a>
+    <a class="navbar-brand mr-1" href="/index">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
     </button>
@@ -136,6 +237,7 @@
       <div class="container-fluid">
 		<ol class="breadcrumb">
           <li class="breadcrumb-item">
+			
 			<!-- Navbar Search -->
 			<h7 id="stravaConnectDesc">스트라바와 연동하면 자신의 라이딩 데이터를 분석 할 수 있습니다.</h7>
 			<form class="d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
@@ -218,19 +320,22 @@
   <a class="scroll-to-top rounded" href="#page-top" style="">
     <i class="fas fa-angle-up"></i>
   </a>
-  <!-- Logout Modal-->
 
   <!--동적스크립트라인-->
   <script type="text/javascript">
-		
+
 		var auth = $('#authComp').val();
 		if(auth == '1'){ //인증됬다는 플래그
 			$('#stravaConnect').hide();
 			$('#stravaConnectDesc').hide();
 			$('#userProfile').show();
 			var colorNames = Object.keys(window.chartColors);
+			
 			//사람을 먼저 넣고
 			$.get("/getAthlete", function(data, status){
+			
+				//loadingBarToggle('1');
+				
 				//alert("Data: " + data + "Status: " + status);
 				var jsonContent = JSON.parse(data);
 				
@@ -284,7 +389,8 @@
 		
 		function next2(){
 		    // 일자별 최고 거리 랭킹
-			var color = ['#FFC19E','#FFE08C','#FAED7D','#CEF279','#B7F0B1', '#B2EBF4', '#B2CCFF'];
+			//var color = ['#FFC19E','#FFE08C','#FAED7D','#CEF279','#B7F0B1', '#B2EBF4', '#B2CCFF'];
+			var color = ['#FDF5E6','#FDF5DC','#FDF5D2','#FDEBC8','#FDE6BE'];
 			var strHTML = '';
 			$.get("/getDistanceRank", function(data, status){
 				
@@ -299,7 +405,7 @@
 					
 					var colorNum = 0;
 					if(i > 0){
-						colorNum = i % colorNum.length;
+						colorNum = i % color.length;
 					}
 					strHTML += '<tr style="background:' + color[colorNum] +'">';
 						strHTML += '<td>' + nullValid(username) + '</td>'
@@ -311,10 +417,11 @@
 				}
 				
 				$("#distRankBody").html(strHTML);
+				
+				//loadingBarToggle('2');
 			});
 		
 		}
-		
 		
    </script>
   
@@ -323,6 +430,9 @@
   <!--dynamicScriptLine-->
   
   <!--<pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>-->
+</div>
+<!-- loading bar -->
+<div id="loader"></div>
 </body>
 
 </html>

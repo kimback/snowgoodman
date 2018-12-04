@@ -19,6 +19,7 @@ var express = require('express');
 var session = require('express-session');
 var querystring = require('querystring');
 var mysql = require('mysql');
+var jsts = require('jsts');
 //---------------------------------------
 //---------------변수 및 사용관련-------------------
 var app = express();
@@ -45,6 +46,7 @@ var connection = initializeConnection({
         post: 3306,
         user: 'root',
         password: '1q2w!!',
+        //password: 'root',
         database: 'snowgoodman'
     });
 connection.connect();
@@ -76,6 +78,15 @@ function initializeConnection(config) {
     return connection;
 }
 
+function sessionCheck(){
+	if(sess.userId === '' || sess.userId == undefined || sess.userId === 'undefined' || sess.userId === 'null' || sess.userId == null){
+		//console.log('-------------세션정보가 없습니다----------------');
+		//res.send('<h1> 연결이 끊겼습니다. 다시 로그인 하세요. !</h1><script>window.location.replace("' + '/index' + '");</script>');
+		return false;
+	}else{
+		return true;
+	}
+}
 
 	
 //세션객체생성
@@ -134,7 +145,7 @@ app.engine('html', require('ejs').renderFile);
 //--------------라우터---------------------
  //index
  app.get('/index',function(req,res){
-	if(sess.userId != undefined && sess.userId != ''){
+	if(sessionCheck()){
 		indexPageLoad(req, res);
 	}else{
 		res.render('index.html'); 
@@ -144,7 +155,7 @@ app.engine('html', require('ejs').renderFile);
  
  //rank
  app.get('/myrecord',function(req,res){
-	if(sess.userId != undefined && sess.userId != ''){
+	if(sessionCheck()){
 		recordPageLoad(req, res);
 	}else{
 		res.render('index.html');
@@ -155,7 +166,7 @@ app.engine('html', require('ejs').renderFile);
  
   //index
  app.get('/rank',function(req,res){
-	if(sess.userId != undefined && sess.userId != ''){
+	if(sessionCheck()){
 		rankPageLoad(req, res);
 	}else{
 		res.render('index.html');
@@ -284,22 +295,24 @@ app.get('/actionIndex', function(req, res){
 
 function commonHeaderControl(type, url, req, res){
 	
+	//변수들
+	
 	var userId = sess.userId;
 	var userName = sess.userName;
 	var profilePic = sess.profilePic;
 	var city = sess.city;
 	var sex = sess.sex;
 	var clubs = sess.clubs;
-		
+	//동적생성을 위한 변수
 	var dynamicContent = '';
 	
 	fs.readFile(url, function (err, data) {
       if (err) {
          console.log(err);
       }else{
-		 console.log("200" + dynamicContent.toString());
+		 console.log("파일읽기성공 -200-" + dynamicContent.toString());
 		 dynamicContent = data.toString();
-		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:white !important; margin-left:12px; margin-top:12px;">안녕하세요' + userId + '(' + userName + ')님</span>');
+		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:black !important; margin-left:12px; margin-top:12px;">안녕하세요' + userId + '(' + userName + ')님</span>');
 		 var output2 = output.toString().replace('#authVal#', '1');
 		 
 		 if(type == 'myrecord'){
@@ -314,7 +327,6 @@ function commonHeaderControl(type, url, req, res){
 		
 			output2 = output2.toString().replace('#profileVal#', totalstr);
 		 }
-		 	 
 		 res.send(output2);
       }
    });
@@ -446,7 +458,7 @@ function getAthleteData(req, res){
 	
 }
 
-
+//------------------------db작업-------------------------------------------------
 
 //활동db저장
 function updateActivityData(req, res, databody){	
@@ -458,7 +470,7 @@ function updateActivityData(req, res, databody){
 		var start_date = databody[i].start_date;
 		var distance = databody[i].distance;
 		var startLatlng = databody[i].start_latlng;
-		//console.log(startLatlng);
+		console.log('startLatlng' + startLatlng);
 		var endLatlng = databody[i].end_latlng;
 		var type = databody[i].type;
 		var map = '';
@@ -471,7 +483,6 @@ function updateActivityData(req, res, databody){
 		var sql = 'insert into activity(activity_id, athlete_id, state_date, distance, start_latlng, end_latlng, type, map, average_speed, max_speed, elev, calories, etc) values(?)';
 		var values = [activityId, athleteId, start_date, distance, '', '', type, map, averageSpeed, maxSpeed, elev, calories, i];
 		//['232','','','','','','','','','','','',''];
-	
 		
 		if (1 == 1) {
 			connection.query(sql, [values], function (err, rows, fields) {
@@ -530,7 +541,7 @@ function updateAthleteData(req, res, databody){
 //거리별 사용자별 랭킹 조회
 function getDistanceRankData(req, res){
 
-	var sql = `SELECT MAX(A.distance) as dist, B.id, B.username, B.city, B.profile, B.clubs
+	var sql = `SELECT SUM(A.distance) as dist, B.id, B.username, B.city, B.profile, B.clubs
 				FROM activity A 
 				LEFT OUTER JOIN user B
 				ON A.athlete_id = B.id
@@ -612,12 +623,13 @@ function getMyRankData(req, res){
 function getTotalDistRank(req, res){
 	
 	var sql = `select @rownum:=@rownum+1 as rk, b.* from
-				(select a.athlete_id, sum(a.distance*1) as dist
-				from activity a
-				group by a.athlete_id
+				(select a.athlete_id, u.username, u.city, u.profile, u.clubs, sum(a.distance*1) as dist
+				from activity a LEFT OUTER JOIN user u
+				ON a.athlete_id = u.id
+				group by a.athlete_id, u.username, u.city, u.profile, u.clubs
 				) b, (select @rownum:=0) TMP
 				order by b.dist desc
-				limit 20;`;
+				limit 10;`;
 				
 	var userId = sess.userId;
 					
@@ -638,12 +650,13 @@ function getTotalDistRank(req, res){
 function getMaxSpeedRank(req, res){
 	
 	var sql = `select  @rownum:=@rownum+1 as rk, b.* from 
-				(select a.athlete_id, max(a.max_speed*1) as speed
-				from activity a
-				group by a.athlete_id
+				(select a.athlete_id, u.username, u.city, u.profile, u.clubs, max(a.max_speed*1) as speed
+				from activity a LEFT OUTER JOIN user u
+				ON a.athlete_id = u.id
+				group by a.athlete_id, u.username, u.city, u.profile, u.clubs
 				) b, (select @rownum:=0) TMP
 				order by b.speed desc
-				limit 20;`;
+				limit 10;`;
 				
 	var userId = sess.userId;
 					
@@ -663,8 +676,8 @@ function getMaxSpeedRank(req, res){
 
 
 function getWeekRecordData(req, res){
-	var userId = sess.userId;
-	var sql = `select count(AA.week) as weekcnt, AA.state_date, AA.week, AA.athlete_id
+	var userId = sess.userId;//AA.state_date, AA.week, AA.athlete_id
+	var sql = `select count(AA.week) as weekcnt, AA.week
 				from
 					(SELECT state_date, DAYOFWEEK(state_date) AS week_n,
 					CASE DAYOFWEEK(state_date)
@@ -706,7 +719,8 @@ function handleResponse(response, req, res, type) {
     console.error(err);
   });
   response.on('data', function (chunk) { //스트림
-    serverData += chunk;
+    console.log(chunk.toString());
+	serverData += chunk;
   });
   response.on('end', function () { 
     console.log("received server data:");
@@ -714,7 +728,7 @@ function handleResponse(response, req, res, type) {
 	if(type === 'auth'){
 		
 		var jsonContent = JSON.parse(serverData);
-		console.log(jsonContent);
+		//console.log('jsonContent:' + jsonContent.toString());
 		
 		//세션값 세팅
 		sess = req.session;	
@@ -723,11 +737,11 @@ function handleResponse(response, req, res, type) {
 		sess.userId = jsonContent.athlete.id;
 		sess.userName = jsonContent.athlete.username;
 		sess.profilePic = jsonContent.athlete.profile;
-		sess.city = jsonContent.athlete.profile;
+		sess.city = jsonContent.athlete.city;
 		sess.sex = jsonContent.athlete.sex;
 		sess.clubs = jsonContent.athlete.clubs;
 		
-		console.log(sess);
+		//console.log('sess--------------------- : ' + sess);
 		res.send('<h1>strava connected !</h1><script>window.location.replace("' + './actionIndex' + '");</script>');
 		
 	}else if(type === 'athlete'){
@@ -752,6 +766,5 @@ function handleResponse(response, req, res, type) {
 var server = app.listen(8080, function(){
 // 배포용 
 //var server = app.listen(8001, function(){
-
-	    console.log("------- server has started on port 8008 --------")
+	    console.log("------- server has started --------")
 });

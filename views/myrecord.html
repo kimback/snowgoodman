@@ -40,69 +40,171 @@
   
   
   <script type="text/javascript">
-
 	<!--개발클라이언트id사용-->
+	//배포용
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//개발용
 	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
-	$(function(){
+		$(function(){
 
-		$('#stravaConnect').click(function(){
-		  requestUserAuth();
+			$('#stravaConnect').click(function(){
+			  requestUserAuth();
+			});
+			
+			
+		$('#sidebarToggle').click(function(){
+			var disp = $('.sidebar').css('display');
+			if(disp === 'none'){
+				$('.sidebar').show();
+			}else{
+				$('.sidebar').hide();
+			}
+			
 		});
 		
-		$('#dataTable1').DataTable({
-			"paging": false, // false to disable pagination (or any other option)
-			"searching" : false,
-			"info" : false,
-			"sort" : false,
-		  });
+			$('#dataTable1').DataTable({
+				"paging": false, // false to disable pagination (or any other option)
+				"searching" : false,
+				"info" : false,
+				"sort" : false,
+			  });
 		
-	});
+		});
 	
-	function requestUserAuth(){
-		window.location.replace(authUrl);
-	}
-	
-	//날짜포맷 util
-	function formatDate(date) {
-		var d = new Date(date),
-			month = '' + (d.getMonth() + 1),
-			day = '' + d.getDate(),
-			year = d.getFullYear();
-
-		if (month.length < 2) month = '0' + month;
-		if (day.length < 2) day = '0' + day;
-
-		return [year, month, day].join('-');
-	}
-	
-	function convertDistance(distance){
-		var result = 0;
-		if(distance > 0){
-			result = (distance / 1000);
-		}
-		return result.toFixed(2);
-	}
-	
-	//스피드의 원값은 km/s 이다. 1km/s = 3600km/h
-	function convertSpeed(speed){
-		var result = 0;
-		if(speed > 0){
-			result = (speed / 3600) * 1000;
+		function requestUserAuth(){
+			window.location.replace(authUrl);
 		}
 	
-		return result.toFixed(1)
-	}
-	
-	function nullValid(content){
-		var result = content;
-		if(result == undefined || result == 'undefined' || result === 'null' || result === 'NULL'){
-			result = '';
-		}
-		return result;
-	}
+		//날짜포맷 util
+		function formatDate(date) {
+			var d = new Date(date),
+				month = '' + (d.getMonth() + 1),
+				day = '' + d.getDate(),
+				year = d.getFullYear();
 
+			if (month.length < 2) month = '0' + month;
+			if (day.length < 2) day = '0' + day;
+
+			return [year, month, day].join('-');
+		}
+	
+		function convertDistance(distance){
+			var result = 0;
+			if(distance > 0){
+				result = (distance / 1000);
+			}
+			return result.toFixed(2);
+		}
+	
+		//스피드의 원값은 km/s 이다. 1km/s = 3600km/h
+		function convertSpeed(speed){
+			var result = 0;
+			if(speed > 0){
+				result = (speed * 3600) / 1000;
+			}
+	
+			return result.toFixed(1)
+		}
+	
+		function nullValid(content){
+			var result = content;
+			if(result == undefined || result == 'undefined' || result === 'null' || result === 'NULL'){
+				result = '-';
+			}
+			return result;
+		}
+	
+		
+		function loadingBarToggle(type){
+		
+			if(type === '1'){
+				//오래걸리는 작업 시작 로딩바 
+				$('#loader').show();
+
+				//일다하고 화면 띄우기
+				$('#contentBody').hide();
+			}else{
+							//오래걸리는 작업 시작 로딩바 
+				$('#loader').hide();
+
+				//일다하고 화면 띄우기
+				$('#contentBody').show();
+
+			}
+	
+		}
+	
 	</script>
+	
+	<style type="text/css">
+			/*@media screen and (max-width: 400px) {
+				body { background-color: red; }
+				h1 { color: white; }
+			}
+			@media screen and (min-width: 401px) and (max-width: 500px) {
+				body { background-color: green; }
+				h1 { color: red; }
+			}*/
+			@media screen and (max-width: 600px) {
+			   .sidebar{
+					display:none;
+			   }
+			}
+	</style>
+	
+	<style>
+		/* Center the loader */
+		#loader {
+		  position: absolute;
+		  left: 50%;
+		  top: 50%;
+		  z-index: 1;
+		  margin: -75px 0 0 -75px;
+		  border: 16px solid #f3f3f3;
+		  border-radius: 50%;
+		  border-top: 16px solid #3498db;
+		  width: 120px;
+		  height: 120px;
+		  -webkit-animation: spin 2s linear infinite;
+		  animation: spin 2s linear infinite;
+		  display: none;
+		}
+
+		@-webkit-keyframes spin {
+		  0% { -webkit-transform: rotate(0deg); }
+		  100% { -webkit-transform: rotate(360deg); }
+		}
+
+		@keyframes spin {
+		  0% { transform: rotate(0deg); }
+		  100% { transform: rotate(360deg); }
+		}
+
+		/* Add animation to "page content" */
+		.animate-bottom {
+		  position: relative;
+		  -webkit-animation-name: animatebottom;
+		  -webkit-animation-duration: 1s;
+		  animation-name: animatebottom;
+		  animation-duration: 1s
+		}
+
+		@-webkit-keyframes animatebottom {
+		  from { bottom:-100px; opacity:0 } 
+		  to { bottom:0px; opacity:1 }
+		}
+
+		@keyframes animatebottom { 
+		  from{ bottom:-100px; opacity:0 } 
+		  to{ bottom:0; opacity:1 }
+		}
+
+	</style>
+
+
+
+
 </head>
 
 <body id="page-top">
@@ -110,19 +212,11 @@
 <input type="hidden" id="profileData" value="#profileVal#"/>
 
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-    <a class="navbar-brand mr-1" href="index.html">S n O w M a N</a>
+    <a class="navbar-brand mr-1" href="/index">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
     </button>
-    <!-- Navbar Search -->
-    <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
-      <div class="input-group">
-		#userLine#
-        <button id="stravaConnect" type="button" class="btn" 
-		style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
-      </div>
-    </form>
-    <!-- Navbar -->
+    
   </nav>
   <div id="wrapper">
     <!-- Sidebar -->
@@ -151,6 +245,21 @@
     </ul>
     <div id="content-wrapper" style="">
       <div class="container-fluid">
+      	  <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+				<!-- Navbar Search -->
+				<h7 id="stravaConnectDesc">스트라바와 연동하면 자신의 라이딩 데이터를 분석 할 수 있습니다.</h7>
+				<form class="d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+				  <div class="input-group">
+					<span id="userProfile" style="display:none;">#userLine#</span>
+					<button id="stravaConnect" type="button" class="btn" 
+					style="width:193px; height:48px; background: url(/resource/strava/1.1connect_with_strava/btn_strava_connectwith_light/btn_strava_connectwith_light.png) no-repeat ; "></button>
+				  </div>
+				</form>
+				<!-- Navbar -->
+			</li>
+			</ol>
+      
         <!-- Breadcrumbs-->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
@@ -162,31 +271,34 @@
         <div class="card mb-3">
           <div class="card-body"> 
 			<div class="list-group">
-			  <a href="#" class="list-group-item list-group-item-success">
+			  <div class="card-header" contenteditable="true">
+              <i class="fas fa-chart-area"></i>&nbsp;
 				사진/ 개인정보 화면구성
-			  </a>
+			  </div>
 			  <a href="#" class="list-group-item" id="profile"><img src="" id="listProfileImg" class="img-circle" alt="Cinque Terre" style="width=100px; height:100px; border-radius:10%;"></a>
-			  <a href="#" class="list-group-item" id="name"></a>
-			  <a href="#" class="list-group-item" id="sex"></a>
-			  <a href="#" class="list-group-item" id="city"></a>
+			  <a href="#" class="list-group-item" id="name">-</a>
+			  <a href="#" class="list-group-item" id="sex">-</a>
+			  <a href="#" class="list-group-item" id="city">-</a>
 			  <a href="#" class="list-group-item" id="rank">현재 00km / 00위</a>
 			</div>
 		   </div>
         </div>
 		
 		<!-- pie Chart Example-->
-        <div class="card mb-3">
-          <div class="card-body">
-            <canvas id="myPieChart" width="100%" height="30"></canvas>
+        <div class="card mb-3" style="padding:10px;">
+        <div class="card-header" contenteditable="true">
+            <i class="fas fa-chart-area"></i>&nbsp;요일별 구분</div>
+          <div class="chart-container" style="position: relative; height:100%; width:100%;">
+            <canvas id="myPieChart"></canvas>
           </div>
         </div>
 		
         <!-- Chart Example-->
-        <div class="card mb-3">
+        <div class="card mb-3" style="height:500px; padding:10px;">
           <div class="card-header" contenteditable="true">
-            <i class="fas fa-chart-area"></i>&nbsp;개인기록</div>
-          <div class="card-body">
-            <canvas id="myLineChart" width="100%" height="30"></canvas>
+            <i class="fas fa-chart-area"></i>&nbsp;일자별 거리/속도</div>
+          <div class="chart-container" style="position: relative; height:100%; width:100%;">
+            <canvas id="myLineChart"></canvas>
           </div>
         </div>
 		
@@ -200,7 +312,7 @@
                     <!--<th>아이디</th>-->
                     <th>날짜</th>
                     <th>거리(km)</th>
-                    <th>타입</th>
+                    <!--<th>타입</th>-->
                     <th>평균속도(km/h)</th>
                     <th>최고속도(km/h)</th>
 					<th>고도</th>
@@ -221,10 +333,13 @@
       <!-- Sticky Footer -->
       <footer class="sticky-footer">
         <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright © Your Website 2018</span>
-          </div>
+	      <div class="copyright text-center my-auto" style="float: left;">
+			<img src="/resource/strava/1.2strava_api_logos/powered by Strava/pwrdBy_strava_light/api_logo_pwrdBy_strava_horiz_light.png" style="width: 150px;"/>
+			<span>Copyright © www.snowgoodman.com 2018 - by kim, joe </span>
+		  </div>
+         
         </div>
+		
       </footer>
     </div>
     <!-- /.content-wrapper -->
@@ -253,6 +368,8 @@
 		if(auth == '1'){ //인증됬다는 플래그
 		
 			$('#stravaConnect').hide();
+			$('#stravaConnectDesc').hide();
+			$('#userProfile').show();
 			
 			//프로필 표시
 			var profileData = $('#profileData').val();
@@ -262,110 +379,113 @@
 			$('#listProfileImg').attr("src", nullValid(profileArray[2]));
 			$('#name').html(nullValid(profileArray[1]));
 			$('#sex').html(nullValid(profileArray[4]));
-			$('#city').html(nullValid(profileArray[5]));
-			//$('#rank').append = '';
+			$('#city').html(nullValid(profileArray[3]));
+			$('#rank').html('랭킹 확인');
+			$('#rank').attr('href', '/rank');
 			
 			
 			//파이차트 - 단순히 기록 데이터를 가지고 하기때문에 .. 거리등으로 썸해서 묶을 필요가 있음
 			$.get("/getWeekRecordData", function(data, status){
-				//alert(data);
-				var labelBuild = new Array();
-				var dataBuild = new Array();
 				
-				for(var i=0; i<data.length; i++){
-					labelBuild[i] = data[i].week; 
-					dataBuild[i] = data[i].weekcnt;
-					
-				}
-				
-				pieConfig.data.labels = labelBuild;
-				pieConfig.data.datasets[0].data = dataBuild;
-				pieChart.update();
+					var labelBuild = new Array();
+					var dataBuild = new Array();
+	
+					for(var i=0; i<data.length; i++){
+						labelBuild[i] = data[i].week; 
+						dataBuild[i] = data[i].weekcnt;
+		
+					}
+	
+					pieConfig.data.labels = labelBuild;
+					pieConfig.data.datasets[0].data = dataBuild;
+					pieChart.update();
+		
 				
 			});
 						
 			//라인차트
 			$.get("/getMyRecordData", function(data, status){
-				var colorNames = Object.keys(window.chartColors);
-				var content = data;
+				
+					var colorNames = Object.keys(window.chartColors);
+					var content = data;
 
-				var newDataset1 = {
-					label: '거리데이터',
-					backgroundColor: 'red',
-					borderColor: 'red',
-					data: [],
-					fill: false
-				};
+					var newDataset1 = {
+						label: '거리데이터',
+						backgroundColor: 'red',
+						borderColor: 'red',
+						data: [],
+						fill: false
+					};
 				
-				var newDataset2 = {
-					label: '최고속도',
-					backgroundColor: 'orange',
-					borderColor: 'orange',
-					data: [],
-					fill: false
-				};
+					var newDataset2 = {
+						label: '최고속도',
+						backgroundColor: 'orange',
+						borderColor: 'orange',
+						data: [],
+						fill: false
+					};
 				
-				/*
-				var newDataset3 = {
-					label: '고도',
-					backgroundColor: 'green',
-					borderColor: 'green',
-					data: [],
-					fill: false
-				};
-				*/
+					/*
+					var newDataset3 = {
+						label: '고도',
+						backgroundColor: 'green',
+						borderColor: 'green',
+						data: [],
+						fill: false
+					};
+					*/
 				
-				/*
-				var newDataset4 = {
-					label: '칼로리',
-					backgroundColor: 'blue',
-					borderColor: 'blue',
-					data: [],
-					fill: false
-				};
-				*/
+					/*
+					var newDataset4 = {
+						label: '칼로리',
+						backgroundColor: 'blue',
+						borderColor: 'blue',
+						data: [],
+						fill: false
+					};
+					*/
 				
-				var strHTML = '';
+					var strHTML = '';
 				
-				for(var i=0; i<content.length; i++){
+					for(var i=0; i<content.length; i++){
 										
-					var userId = content[i].athlete_id;
-					var startDate = content[i].state_date;
-					var dist = content[i].distance;
-					var type = content[i].type;
-					var averageSpeed = content[i].average_speed;
-					var maxSpeed = content[i].max_speed;
-					var elev = content[i].elev;
-					var calories = content[i].calories;
+						var userId = content[i].athlete_id;
+						var startDate = content[i].state_date;
+						var dist = content[i].distance;
+						var type = content[i].type;
+						var averageSpeed = content[i].average_speed;
+						var maxSpeed = content[i].max_speed;
+						var elev = content[i].elev;
+						var calories = content[i].calories;
 										
-					//라벨 x축 date
-					//데이터 y축 distance
-					config.data.labels.push(formatDate(startDate)); //state 오타 = stratdate
-					newDataset1.data.push(convertDistance(dist)); //거리
-					newDataset2.data.push(convertSpeed(maxSpeed)); //속도
-					//newDataset3.data.push(elev); //고도
-					//newDataset4.data.push(calories); //칼로리
+						//라벨 x축 date
+						//데이터 y축 distance
+						config.data.labels.push(formatDate(startDate)); //state 오타 = stratdate
+						newDataset1.data.push(convertDistance(dist)); //거리
+						newDataset2.data.push(convertSpeed(maxSpeed)); //속도
+						//newDataset3.data.push(elev); //고도
+						//newDataset4.data.push(calories); //칼로리
 								
-					strHTML += '<tr>';
-						//strHTML += '<td>' + nullValid(userId) + '</td>'
-						strHTML += '<td>' + nullValid(formatDate(startDate)) + '</td>'
-						strHTML += '<td>' + nullValid(convertDistance(dist)) + '</td>'
-						strHTML += '<td>' + nullValid(type) + '</td>'
-						strHTML += '<td>' + nullValid(convertSpeed(averageSpeed)) + '</td>'
-						strHTML += '<td>' + nullValid(convertSpeed(maxSpeed)) + '</td>'
-						strHTML += '<td>' + nullValid(elev) + '</td>'
-						strHTML += '<td>' + nullValid(calories) + '</td>'
-					strHTML += '</tr>'		
+						strHTML += '<tr>';
+							//strHTML += '<td>' + nullValid(userId) + '</td>'
+							strHTML += '<td>' + nullValid(formatDate(startDate)) + '</td>'
+							strHTML += '<td>' + nullValid(convertDistance(dist)) + '</td>'
+							//strHTML += '<td>' + nullValid(type) + '</td>'
+							strHTML += '<td>' + nullValid(convertSpeed(averageSpeed)) + '</td>'
+							strHTML += '<td>' + nullValid(convertSpeed(maxSpeed)) + '</td>'
+							strHTML += '<td>' + nullValid(elev) + '</td>'
+							strHTML += '<td>' + nullValid(calories) + '</td>'
+						strHTML += '</tr>'		
 					
-				}
+					}
 								
-				config.data.datasets.push(newDataset1);
-				config.data.datasets.push(newDataset2);
-				//config.data.datasets.push(newDataset3);
-				//config.data.datasets.push(newDataset4);
-				window.myLine.update();
+					config.data.datasets.push(newDataset1);
+					config.data.datasets.push(newDataset2);
+					//config.data.datasets.push(newDataset3);
+					//config.data.datasets.push(newDataset4);
+					window.myLine.update();
 				
-				$("#privateDataBody").html(strHTML);	
+					$("#privateDataBody").html(strHTML);	
 				
 			});
 			
@@ -373,7 +493,7 @@
 				
 	</script>
   
-  
+  <div id="loader"></div>
   <!--<pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 20px;right:20px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:220px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo Free&nbsp;&nbsp;<img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16"></pingendo>-->
 </body>
 
