@@ -275,11 +275,11 @@
               <i class="fas fa-chart-area"></i>&nbsp;
 				사진/ 개인정보 화면구성
 			  </div>
-			  <a href="#" class="list-group-item" id="profile"><img src="" id="listProfileImg" class="img-circle" alt="Cinque Terre" style="width=100px; height:100px; border-radius:10%;"></a>
-			  <a href="#" class="list-group-item" id="name">-</a>
-			  <a href="#" class="list-group-item" id="sex">-</a>
-			  <a href="#" class="list-group-item" id="city">-</a>
-			  <a href="#" class="list-group-item" id="rank">현재 00km / 00위</a>
+			  <a href="#" class="list-group-item" id="profile" style="text-align: center;"><img src="" id="listProfileImg" class="img-circle" alt="Cinque Terre" style="width=100px; height:100px; border-radius:10%;"></a>
+			  <a href="#" class="list-group-item" id="name" style="text-align: center;">-</a>
+			  <a href="#" class="list-group-item" id="sex" style="text-align: center;">-</a>
+			  <a href="#" class="list-group-item" id="city" style="text-align: center;">-</a>
+			  <a href="#" class="list-group-item" id="rank" style="text-align: center;">현재 00km / 00위</a>
 			</div>
 		   </div>
         </div>
@@ -294,9 +294,10 @@
         </div>
 		
         <!-- Chart Example-->
-        <div class="card mb-3" style="height:500px; padding:10px;">
+        <div class="card mb-3" style="height:400px; padding:10px;">
           <div class="card-header" contenteditable="true">
-            <i class="fas fa-chart-area"></i>&nbsp;일자별 거리/속도</div>
+            <i class="fas fa-chart-area"></i>&nbsp;일자별 거리/속도
+			</div>
           <div class="chart-container" style="position: relative; height:100%; width:100%;">
             <canvas id="myLineChart"></canvas>
           </div>
@@ -315,7 +316,7 @@
                     <!--<th>타입</th>-->
                     <th>평균속도(km/h)</th>
                     <th>최고속도(km/h)</th>
-					<th>고도</th>
+					<!--<th>고도</th>-->
 					<th>칼로리</th>
 					
                   </tr>
@@ -408,19 +409,20 @@
 				
 					var colorNames = Object.keys(window.chartColors);
 					var content = data;
-
+					var colors = ['#F6CECE', '#F5F6CE', '#CEF6CE', '#CEF6F5', '#CECEF6', '#F6CEEC', '#F2F5A9'];
+					
 					var newDataset1 = {
 						label: '거리데이터',
-						backgroundColor: 'red',
-						borderColor: 'red',
+						backgroundColor: colors[0],
+						borderColor: colors[0],
 						data: [],
 						fill: false
 					};
 				
 					var newDataset2 = {
 						label: '최고속도',
-						backgroundColor: 'orange',
-						borderColor: 'orange',
+						backgroundColor: colors[4],
+						borderColor: colors[4],
 						data: [],
 						fill: false
 					};
@@ -473,7 +475,7 @@
 							//strHTML += '<td>' + nullValid(type) + '</td>'
 							strHTML += '<td>' + nullValid(convertSpeed(averageSpeed)) + '</td>'
 							strHTML += '<td>' + nullValid(convertSpeed(maxSpeed)) + '</td>'
-							strHTML += '<td>' + nullValid(elev) + '</td>'
+							//strHTML += '<td>' + nullValid(elev) + '</td>'
 							strHTML += '<td>' + nullValid(calories) + '</td>'
 						strHTML += '</tr>'		
 					

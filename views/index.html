@@ -33,6 +33,14 @@
   <script src="/js/demo/datatables-demo.js"></script>
   <!--<script src="/js/demo/chart-bar-demo.js"></script>-->
   
+  
+  
+  <!--테스트중-->
+  <script src="/js/jsts.js"></script>
+  
+  
+  
+  
   <!--chart유틸-->
   <script src="/js/chart.js/utils.js"></script>
   <!--개인기록차트-->
@@ -69,6 +77,32 @@
 			"info" : false,
 			"sort" : false,
 		  });
+		  
+		  
+		  
+		  
+		  
+		  
+	/*  테스트중
+	var sampleLocation = [new jsts.geom.Coordinate(37.513442, 127.056452),new jsts.geom.Coordinate(37.507932, 127.059391),new jsts.geom.Coordinate(37.509055, 127.062867),new jsts.geom.Coordinate(37.514041, 127.060012),new jsts.geom.Coordinate(37.513442, 127.056452)];
+	console.log(sampleLocation);
+	var curLati = 37.5089244;
+	var curLogt = 127.0589948;
+	var currCoordinate = new jsts.geom.Coordinate(curLati, curLogt);
+
+
+	var geometryFactory = new jsts.geom.GeometryFactory();
+	//console.log(geometryFactory);
+	var myLocationPoint = geometryFactory.createPoint(currCoordinate);
+
+
+	//var locationWithIn = myLocationPoint.within(sampleLocation);
+	alert('locationWithIn: -----------' + myLocationPoint);
+	*/
+	
+	
+	
+	
 		  	
 	});
 	
@@ -326,9 +360,11 @@
 
 		var auth = $('#authComp').val();
 		if(auth == '1'){ //인증됬다는 플래그
+		
 			$('#stravaConnect').hide();
 			$('#stravaConnectDesc').hide();
 			$('#userProfile').show();
+			
 			var colorNames = Object.keys(window.chartColors);
 			
 			//사람을 먼저 넣고
@@ -339,10 +375,18 @@
 				//alert("Data: " + data + "Status: " + status);
 				var jsonContent = JSON.parse(data);
 				
-				$.get("/athleteDataUpdating", {dataBody : jsonContent}, function(data, status){
-					//alert(data);
-					next();				
-				});
+				//시간이 지나서 인증토큰이 유효하지 않은 상황
+				if(jsonContent.message === 'Authorization Error'){
+					alert('연결이 끊어졌습니다. 다시 로그인 해주세요.');
+					requestUserAuth();
+					
+				}else{ //인증성공후 다음로직
+				
+					$.get("/athleteDataUpdating", {dataBody : jsonContent}, function(data, status){
+						//alert(data);
+						next();				
+					});
+				}
 			});
 			
 		}else{

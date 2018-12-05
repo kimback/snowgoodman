@@ -271,7 +271,7 @@
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-list-alt"></i> 나의 랭킹</div>
-          <div class="card-body"><span id="myDistRank"></span></div>
+          <div class="card-body" style="background: beige;"><span id="myDistRank"></span></div>
         </div>
         
 		
@@ -281,7 +281,7 @@
             <i class="fas fa-list-alt"></i> 거리 랭킹</div>
 			
 			<!--table start-->
-			<div class="card-body">
+			<div class="card-body" >
 				<div class="table-responsive">
 				  <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
 					<thead>
@@ -289,7 +289,7 @@
 						<th>순위</th>
 						<th>이름</th>
 						<th>거리(km)</th>
-						<th>지역</th>
+						<!--<th>지역</th>-->
 						<th>프로필</th>
 						<th>클럽</th>
 					  </tr>
@@ -318,7 +318,7 @@
 							<th>순위</th>
 							<th>이름</th>
 							<th>속도(km/h)</th>
-							<th>지역</th>
+							<!--<th>지역</th>-->
 							<th>프로필</th>
 							<th>클럽</th>
 						  </tr>
@@ -398,7 +398,7 @@
 								txtBuild += '<td>' + nullValid(data[i].rk) + '</td>'
 								txtBuild += '<td>' + nullValid(data[i].username) + '</td>'
 								txtBuild += '<td>' + nullValid(convertDistance(data[i].dist)) + '</td>'
-								txtBuild += '<td>' + nullValid(data[i].city) + '</td>'
+								//txtBuild += '<td>' + nullValid(data[i].city) + '</td>'
 								txtBuild += '<td>' + '<img src="' + nullValid(data[i].profile) + '" id="profile_rank" class="img-circle" alt="Cinque Terre" style="width=30px; height:30px; border-radius:10%;"/>' + '</td>'
 								txtBuild += '<td>' + nullValid(data[i].clubs) + '</td>'
 							txtBuild += '</tr>'
@@ -417,7 +417,7 @@
 								txtBuild += '<td>' + nullValid(data[i].rk) + '</td>'
 								txtBuild += '<td>' + nullValid(data[i].username) + '</td>'
 								txtBuild += '<td>' + nullValid(convertSpeed(data[i].speed)) + '</td>'
-								txtBuild += '<td>' + nullValid(data[i].city) + '</td>'
+								//txtBuild += '<td>' + nullValid(data[i].city) + '</td>'
 								txtBuild += '<td>' + '<img src="' + nullValid(data[i].profile) + '" id="profile_rank" class="img-circle" alt="Cinque Terre" style="width=30px; height:30px; border-radius:10%;"/>' +  '</td>'
 								txtBuild += '<td>' + nullValid(data[i].clubs) + '</td>'
 							txtBuild += '</tr>'

@@ -28,6 +28,7 @@ var sess = '';
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
 
+
 //배포용
 /*
 var connection = initializeConnection({
@@ -145,6 +146,7 @@ app.engine('html', require('ejs').renderFile);
 //--------------라우터---------------------
  //index
  app.get('/index',function(req,res){
+		 
 	if(sessionCheck()){
 		indexPageLoad(req, res);
 	}else{
@@ -469,9 +471,9 @@ function updateActivityData(req, res, databody){
 		var athleteId = databody[i].athlete.id;
 		var start_date = databody[i].start_date;
 		var distance = databody[i].distance;
-		var startLatlng = databody[i].start_latlng;
-		console.log('startLatlng' + startLatlng);
-		var endLatlng = databody[i].end_latlng;
+		var startLatlng = "'" + databody[i].start_latlng + "'";
+		//console.log('startLatlng' + startLatlng);
+		var endLatlng = "'" + databody[i].end_latlng + "'";
 		var type = databody[i].type;
 		var map = '';
 		var averageSpeed = databody[i].average_speed;
@@ -481,7 +483,7 @@ function updateActivityData(req, res, databody){
 		
 		
 		var sql = 'insert into activity(activity_id, athlete_id, state_date, distance, start_latlng, end_latlng, type, map, average_speed, max_speed, elev, calories, etc) values(?)';
-		var values = [activityId, athleteId, start_date, distance, '', '', type, map, averageSpeed, maxSpeed, elev, calories, i];
+		var values = [activityId, athleteId, start_date, distance, startLatlng, endLatlng, type, map, averageSpeed, maxSpeed, elev, calories, i];
 		//['232','','','','','','','','','','','',''];
 		
 		if (1 == 1) {
@@ -730,6 +732,7 @@ function handleResponse(response, req, res, type) {
 		var jsonContent = JSON.parse(serverData);
 		//console.log('jsonContent:' + jsonContent.toString());
 		
+		sess = '';
 		//세션값 세팅
 		sess = req.session;	
 		sess.access_token = jsonContent.access_token;
@@ -742,7 +745,7 @@ function handleResponse(response, req, res, type) {
 		sess.clubs = jsonContent.athlete.clubs;
 		
 		//console.log('sess--------------------- : ' + sess);
-		res.send('<h1>strava connected !</h1><script>window.location.replace("' + './actionIndex' + '");</script>');
+		res.send('<h3>연결에 성공하였습니다. 데이터를 분석중입니다! </h3><script>window.location.replace("' + './actionIndex' + '");</script>');
 		
 	}else if(type === 'athlete'){
 		//DB에 저장하는 로직 필요

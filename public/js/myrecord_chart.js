@@ -37,6 +37,7 @@ var config = {
 				}
 			}]
 		},
+		maintainAspectRatio: false,
 		/*
 		tooltips: {
 		  callbacks: {
@@ -70,7 +71,7 @@ var pieConfig = {
 		labels: [],
 		datasets: [{
 		  data: [],
-		  backgroundColor: ['#007bff', '#dc3545', '#ffc107', '#28a745', '#007bff', '#dc3545', '#ffc107'],
+		  backgroundColor: ['#F6CECE', '#F5F6CE', '#CEF6CE', '#CEF6F5', '#CECEF6', '#F6CEEC', '#F2F5A9'],
 		}],
 	},
 };
