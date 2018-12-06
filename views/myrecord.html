@@ -42,9 +42,9 @@
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
 	//배포용
-	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	//개발용
-	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 		$(function(){
 
@@ -354,6 +354,10 @@
 	
 	<!--동적스크립트라인-->
 	<script type="text/javascript">
+		$('#logout').click(function(){
+			window.location.replace('/logout');
+		
+		});
 		
 		//파이차트
 		var ctxPie = document.getElementById('myPieChart');

@@ -1,5 +1,6 @@
 
 //v.1.0
+//20181205 작업
 
 
 //----------------------------------------
@@ -23,25 +24,25 @@ var jsts = require('jsts');
 //---------------------------------------
 //---------------변수 및 사용관련-------------------
 var app = express();
-var sess = '';
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
 
 
 //배포용
-/*
-var connection = initializeConnection({
+var dbConfig = {
     host: '10.0.0.1',
 	post: 3306,
 	user: 'snowgoodman',
 	password: 'snowman157248!',
 	database: 'snowgoodman'
-});
-*/
+};
+var connection = initializeConnection(dbConfig);
+
 
 
 //개발용
+/*
  var connection = mysql.createConnection({
         host: 'localhost',
         post: 3306,
@@ -51,7 +52,7 @@ var connection = initializeConnection({
         database: 'snowgoodman'
     });
 connection.connect();
-
+*/
 
 //배포시 커넥션 끊어지는 문제로 추가
 function initializeConnection(config) {
@@ -79,7 +80,8 @@ function initializeConnection(config) {
     return connection;
 }
 
-function sessionCheck(){
+function sessionCheck(req){
+	var sess = req.session;
 	if(sess.userId === '' || sess.userId == undefined || sess.userId === 'undefined' || sess.userId === 'null' || sess.userId == null){
 		//console.log('-------------세션정보가 없습니다----------------');
 		//res.send('<h1> 연결이 끊겼습니다. 다시 로그인 하세요. !</h1><script>window.location.replace("' + '/index' + '");</script>');
@@ -92,9 +94,9 @@ function sessionCheck(){
 	
 //세션객체생성
 app.use(session({
- secret: '@#@$MYSIGN#@$#$',
- resave: false,
- saveUninitialized: true
+	secret: '@#@$MYSIGN#@$#$',
+	resave: false,
+	saveUninitialized: true,
 }));
 
 
@@ -146,8 +148,8 @@ app.engine('html', require('ejs').renderFile);
 //--------------라우터---------------------
  //index
  app.get('/index',function(req,res){
-		 
-	if(sessionCheck()){
+	connection = initializeConnection(dbConfig);//db도 확인하고
+	if(sessionCheck(req)){
 		indexPageLoad(req, res);
 	}else{
 		res.render('index.html'); 
@@ -157,7 +159,8 @@ app.engine('html', require('ejs').renderFile);
  
  //rank
  app.get('/myrecord',function(req,res){
-	if(sessionCheck()){
+	connection = initializeConnection(dbConfig);
+	if(sessionCheck(req)){
 		recordPageLoad(req, res);
 	}else{
 		res.render('index.html');
@@ -168,7 +171,8 @@ app.engine('html', require('ejs').renderFile);
  
   //index
  app.get('/rank',function(req,res){
-	if(sessionCheck()){
+ 	connection = initializeConnection(dbConfig);
+	if(sessionCheck(req)){
 		rankPageLoad(req, res);
 	}else{
 		res.render('index.html');
@@ -176,6 +180,17 @@ app.engine('html', require('ejs').renderFile);
 	  
  });
  
+ 
+ 
+app.get('/actionIndex', function(req, res){
+  connection = initializeConnection(dbConfig);
+  if(sessionCheck(req)){
+	  indexPageLoad(req, res);
+  }else{
+	  res.render('index.html');
+  }
+  
+});
  
  
 //인증1
@@ -200,6 +215,7 @@ app.get('/*auth1result*', function(req, res){
 
 //활동조회
 app.get('/getActivity', function(req, res){
+	var sess = req.session;
 	console.log('-------------getActivity-----------');
 	
 	//해더 완성
@@ -219,6 +235,7 @@ app.get('/getActivity', function(req, res){
 
 //운동선수
 app.get('/getAthlete', function(req, res){
+	var sess = req.session;
 	console.log('-------------getAthlete-----------');
 	athleteOptions.headers.Authorization = 'Bearer ' + sess.access_token;
 	console.log(athleteOptions);
@@ -226,6 +243,12 @@ app.get('/getAthlete', function(req, res){
 	//운동선수 데이터
 	getAthleteData(req, res);
 });
+
+//로그아웃
+app.get('/logout', function(req, res){
+	logoutSessionDelete(req, res);
+});
+
 
 
 
@@ -275,20 +298,6 @@ app.get('/getWeekRecordData',function(req,res){
 });
 
 
-
-//동적파일 서비스------------------------------------------------------------
-app.get('/actionIndex', function(req, res){
-  if(sess.userId != undefined && sess.userId != ''){
-	  indexPageLoad(req, res);
-  }else{
-	  res.render('index.html');
-  }
-  
-	
-});
-//동적파일 서비스---------------------
-
-
 //-------------라우터----------------------
 	
 
@@ -296,9 +305,9 @@ app.get('/actionIndex', function(req, res){
 
 
 function commonHeaderControl(type, url, req, res){
+	var sess = req.session;
 	
 	//변수들
-	
 	var userId = sess.userId;
 	var userName = sess.userName;
 	var profilePic = sess.profilePic;
@@ -314,7 +323,7 @@ function commonHeaderControl(type, url, req, res){
       }else{
 		 console.log("파일읽기성공 -200-" + dynamicContent.toString());
 		 dynamicContent = data.toString();
-		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:black !important; margin-left:12px; margin-top:12px;">안녕하세요' + userId + '(' + userName + ')님</span>');
+		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:black !important; margin-left:12px; margin-top:12px;">안녕하세요' + userId + '(' + userName + ')님</span><br/><input id="logout" class="success" type="button" value="로그아웃"/>');
 		 var output2 = output.toString().replace('#authVal#', '1');
 		 
 		 if(type == 'myrecord'){
@@ -409,6 +418,7 @@ function dataRefreshAndUpdate(req, res){
 
 //활동조회 시작
 function startGetActivity(req, res){
+	var sess = req.session;
 	console.log('-------------getActivity-----------');
 	
 	//해더 완성
@@ -439,6 +449,7 @@ function getActivityData(req, res, postData){
 }
 
 function startGetAthleteData(req, res){
+	var sess = req.session;
 	console.log('-------------getAthlete-----------');
 	//console.log('-------------sess.access_token-----------' + sess.access_token);
 	athleteOptions.headers.Authorization = 'Bearer ' + sess.access_token;
@@ -459,6 +470,21 @@ function getAthleteData(req, res){
 	httpsRequest.end();//http call execute
 	
 }
+
+
+function logoutSessionDelete(req, res){
+	req.session.destroy(function(err){
+		if(err){
+			console.log(err);
+			res.send('<script>alert("로그아웃실패!");window.location.replace("' + './index' + '");</script>');
+		}else{
+			res.send('<script>alert("로그아웃성공!");window.location.replace("' + './index' + '");</script>');
+		}
+	  // cannot access session here
+	});  // 세션 삭제
+	
+}
+
 
 //------------------------db작업-------------------------------------------------
 
@@ -566,6 +592,7 @@ function getDistanceRankData(req, res){
 }
 
 function getMyRecordData(req, res){
+	var sess = req.session;
 	
 	var sql = `SELECT activity_id, athlete_id, state_date, distance, type, average_speed, max_speed, elev, calories
 				FROM activity
@@ -590,6 +617,7 @@ function getMyRecordData(req, res){
 
 
 function getMyRankData(req, res){
+	var sess = req.session;
 	var whereVal = [sess.userId, sess.userId];
 	var sql = `(SELECT AA.*, '거리' as etc FROM
 				(select @rownum1:=@rownum1+1 as rk, b.* from
@@ -623,7 +651,7 @@ function getMyRankData(req, res){
 
 
 function getTotalDistRank(req, res){
-	
+	var sess = req.session;
 	var sql = `select @rownum:=@rownum+1 as rk, b.* from
 				(select a.athlete_id, u.username, u.city, u.profile, u.clubs, sum(a.distance*1) as dist
 				from activity a LEFT OUTER JOIN user u
@@ -650,7 +678,7 @@ function getTotalDistRank(req, res){
 }
 
 function getMaxSpeedRank(req, res){
-	
+	var sess = req.session;
 	var sql = `select  @rownum:=@rownum+1 as rk, b.* from 
 				(select a.athlete_id, u.username, u.city, u.profile, u.clubs, max(a.max_speed*1) as speed
 				from activity a LEFT OUTER JOIN user u
@@ -678,6 +706,7 @@ function getMaxSpeedRank(req, res){
 
 
 function getWeekRecordData(req, res){
+	var sess = req.session;
 	var userId = sess.userId;//AA.state_date, AA.week, AA.athlete_id
 	var sql = `select count(AA.week) as weekcnt, AA.week
 				from
@@ -732,9 +761,8 @@ function handleResponse(response, req, res, type) {
 		var jsonContent = JSON.parse(serverData);
 		//console.log('jsonContent:' + jsonContent.toString());
 		
-		sess = '';
 		//세션값 세팅
-		sess = req.session;	
+		var sess = req.session;	
 		sess.access_token = jsonContent.access_token;
 		sess.refresh_token = jsonContent.refresh_token;
 		sess.userId = jsonContent.athlete.id;
@@ -766,8 +794,8 @@ function handleResponse(response, req, res, type) {
 //-----------------------------------------------
 
 //개발용 
-var server = app.listen(8080, function(){
+//var server = app.listen(8080, function(){
 // 배포용 
-//var server = app.listen(8001, function(){
+var server = app.listen(8001, function(){
 	    console.log("------- server has started --------")
 });

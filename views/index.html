@@ -49,9 +49,9 @@
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
 	//배포용
-	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	//개발용
-	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 	$(function(){
 		//연결요청
@@ -235,7 +235,7 @@
 <body id="page-top">
 <div id="contentBody">
   <input type="hidden" id="authComp" value="#authVal#"/>
-  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top" style="background-image: url(/resource/topback.jpg);">
     <a class="navbar-brand mr-1" href="/index">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
@@ -311,7 +311,7 @@
                 <!--<canvas id="myAreaChart" width="100%" height="30"></canvas>-->
 				<!--table start-->
 				<div class="table-responsive">
-				  <table class="table table-bordered" id="dataTable1">
+				  <table class="table table-striped table-bordered" id="dataTable1">
 					<thead>
 					  <tr>
 						<th>이름</th>
@@ -358,6 +358,11 @@
   <!--동적스크립트라인-->
   <script type="text/javascript">
 
+		$('#logout').click(function(){
+			window.location.replace('/logout');
+		
+		});
+  
 		var auth = $('#authComp').val();
 		if(auth == '1'){ //인증됬다는 플래그
 		
