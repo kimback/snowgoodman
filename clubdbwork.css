@@ -1,0 +1,25 @@
+
+-- 클럽별 누적 거리 랭킹
+select @rownum:=@rownum+1 as rk, b.* from
+(select sum(a.distance*1) as dist, u.clubs
+from activity a LEFT OUTER JOIN user u
+ON a.athlete_id = u.id
+group by u.clubs
+) b, (select @rownum:=0) TMP
+order by b.dist desc
+limit 10;
+
+
+
+
+
+-- 클럽내부 거리 랭킹 (조건에 유저클럽 있어야함)
+select @rownum:=@rownum+1 as rk, b.* from 
+(select sum(a.distance) as dist, a.athlete_id, u.username, u.clubs from activity a left outer join user u
+on a.athlete_id = u.id
+group by a.athlete_id, u.username, u.clubs) b, (select @rownum:=0) TMP
+where b.clubs = '휘팍5'
+order by b.dist desc;
+
+
+
