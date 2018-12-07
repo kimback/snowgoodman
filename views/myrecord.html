@@ -42,9 +42,9 @@
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
 	//배포용
-	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	//개발용
-	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 		$(function(){
 
@@ -94,7 +94,7 @@
 			if(distance > 0){
 				result = (distance / 1000);
 			}
-			return result.toFixed(2);
+			return result.toFixed(0);
 		}
 	
 		//스피드의 원값은 km/s 이다. 1km/s = 3600km/h
@@ -104,7 +104,7 @@
 				result = (speed * 3600) / 1000;
 			}
 	
-			return result.toFixed(1)
+			return result.toFixed(0)
 		}
 	
 		function nullValid(content){
@@ -211,7 +211,7 @@
 <input type="hidden" id="authComp" value="#authVal#"/>
 <input type="hidden" id="profileData" value="#profileVal#"/>
 
-  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top" style="background-image: url(/resource/topback.jpg);">
     <a class="navbar-brand mr-1" href="/index">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
@@ -238,7 +238,7 @@
           <span>랭킹</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="/club">
           <i class="fas fa-fw fa-cloud"></i>
           <span>클럽</span></a>
       </li>
@@ -279,7 +279,8 @@
 			  <a href="#" class="list-group-item" id="name" style="text-align: center;">-</a>
 			  <a href="#" class="list-group-item" id="sex" style="text-align: center;">-</a>
 			  <a href="#" class="list-group-item" id="city" style="text-align: center;">-</a>
-			  <a href="#" class="list-group-item" id="rank" style="text-align: center;">현재 00km / 00위</a>
+			  <a href="#" class="list-group-item" id="club" style="text-align: center;">-</a>
+			  <a href="#" class="list-group-item" id="rank" style="text-align: center; background: aliceblue;">현재 00km / 00위</a>
 			</div>
 		   </div>
         </div>
@@ -308,16 +309,16 @@
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
-                <thead>
+                <thead style="background: aliceblue;">
                   <tr>
                     <!--<th>아이디</th>-->
                     <th>날짜</th>
-                    <th>거리(km)</th>
+                    <th>거리</th>
                     <!--<th>타입</th>-->
-                    <th>평균속도(km/h)</th>
-                    <th>최고속도(km/h)</th>
+                    <th>평균속도</th>
+                    <th>최고속도</th>
 					<!--<th>고도</th>-->
-					<th>칼로리</th>
+					<!--<th>칼로리</th>-->
 					
                   </tr>
                 </thead>
@@ -385,6 +386,7 @@
 			$('#name').html(nullValid(profileArray[1]));
 			$('#sex').html(nullValid(profileArray[4]));
 			$('#city').html(nullValid(profileArray[3]));
+			$('#club').html(nullValid(profileArray[5]));
 			$('#rank').html('랭킹 확인');
 			$('#rank').attr('href', '/rank');
 			
@@ -475,12 +477,12 @@
 						strHTML += '<tr>';
 							//strHTML += '<td>' + nullValid(userId) + '</td>'
 							strHTML += '<td>' + nullValid(formatDate(startDate)) + '</td>'
-							strHTML += '<td>' + nullValid(convertDistance(dist)) + '</td>'
+							strHTML += '<td>' + nullValid(convertDistance(dist)) + 'km</td>'
 							//strHTML += '<td>' + nullValid(type) + '</td>'
-							strHTML += '<td>' + nullValid(convertSpeed(averageSpeed)) + '</td>'
-							strHTML += '<td>' + nullValid(convertSpeed(maxSpeed)) + '</td>'
+							strHTML += '<td>' + nullValid(convertSpeed(averageSpeed)) + 'km/h</td>'
+							strHTML += '<td>' + nullValid(convertSpeed(maxSpeed)) + 'km/h</td>'
 							//strHTML += '<td>' + nullValid(elev) + '</td>'
-							strHTML += '<td>' + nullValid(calories) + '</td>'
+							//strHTML += '<td>' + nullValid(calories) + '</td>'
 						strHTML += '</tr>'		
 					
 					}

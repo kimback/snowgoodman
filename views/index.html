@@ -33,12 +33,8 @@
   <script src="/js/demo/datatables-demo.js"></script>
   <!--<script src="/js/demo/chart-bar-demo.js"></script>-->
   
-  
-  
   <!--테스트중-->
-  <script src="/js/jsts.js"></script>
-  
-  
+  <!--<script src="/js/jsts.js"></script>-->
   
   
   <!--chart유틸-->
@@ -49,9 +45,9 @@
   <script type="text/javascript">
 	<!--개발클라이언트id사용-->
 	//배포용
-	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	//개발용
-	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 	$(function(){
 		//연결요청
@@ -130,7 +126,7 @@
 		if(distance > 0){
 			result = (distance / 1000);
 		}
-		return result.toFixed(2);
+		return result.toFixed(0);
 	}
 	
 	//널체크
@@ -262,7 +258,7 @@
           <span>랭킹</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="/club">
           <i class="fas fa-fw fa-cloud"></i>
           <span>클럽</span></a>
       </li>
@@ -311,11 +307,11 @@
                 <!--<canvas id="myAreaChart" width="100%" height="30"></canvas>-->
 				<!--table start-->
 				<div class="table-responsive">
-				  <table class="table table-striped table-bordered" id="dataTable1">
-					<thead>
+				  <table class="table table-bordered" id="dataTable1"><!-- 줄무니옵션 table-striped -->
+					<thead style="background: aliceblue;">
 					  <tr>
 						<th>이름</th>
-						<th>거리(km)</th>
+						<th>거리</th>
 						<th>지역</th>
 						<th>프로필</th>
 						<th>클럽</th>
@@ -388,8 +384,12 @@
 				}else{ //인증성공후 다음로직
 				
 					$.get("/athleteDataUpdating", {dataBody : jsonContent}, function(data, status){
-						//alert(data);
-						next();				
+						
+						if(data === 'success'){
+							next();
+						}else{
+							//db 업데이트 err
+						}
 					});
 				}
 			});
@@ -456,9 +456,10 @@
 					if(i > 0){
 						colorNum = i % color.length;
 					}
-					strHTML += '<tr style="background:' + color[colorNum] +'">';
+					//'<tr style="background:' + color[colorNum] +'">';
+					strHTML += '<tr>';
 						strHTML += '<td>' + nullValid(username) + '</td>'
-						strHTML += '<td>' + nullValid(convertDistance(dist)) + '</td>'
+						strHTML += '<td>' + nullValid(convertDistance(dist)) + 'km</td>'
 						strHTML += '<td>' + nullValid(city) + '</td>'
 						strHTML += '<td>' + '<img src="' + nullValid(profile) + '" id="profile_rank" class="img-circle" alt="Cinque Terre" style="width=30px; height:30px; border-radius:10%;"/>' + '</td>'
 						strHTML += '<td>' + nullValid(clubs) + '</td>'
@@ -468,9 +469,11 @@
 				$("#distRankBody").html(strHTML);
 				
 				//loadingBarToggle('2');
+				
 			});
 		
 		}
+		
 		
    </script>
   

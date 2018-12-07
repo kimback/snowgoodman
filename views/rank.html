@@ -42,9 +42,9 @@
 
 	<!--개발클라이언트id사용-->
 	//배포용
-	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowmangood.cafe24app.com/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	//개발용
-	//var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
+	var authUrl = 'https://www.strava.com/oauth/authorize?client_id=29632&redirect_uri=http://snowman.com:8080/auth1result&response_type=code&approval_prompt=force&scope=activity:read_all'
 	
 		$(function(){
 			$('#stravaConnect').click(function(){
@@ -218,7 +218,7 @@
 <input type="hidden" id="authComp" value="#authVal#"/>
 <input type="hidden" id="profileData" value="#profileVal#"/>
 
-  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top" style="background-image: url(/resource/topback.jpg);">
     <a class="navbar-brand mr-1" href="/index">S n O w M a N</a>
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
@@ -245,7 +245,7 @@
           <span>랭킹</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="/club">
           <i class="fas fa-fw fa-cloud"></i>
           <span>클럽</span></a>
       </li>
@@ -284,7 +284,7 @@
 			<div class="card-body" >
 				<div class="table-responsive">
 				  <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
-					<thead>
+					<thead style="background: aliceblue;">
 					  <tr>
 						<th>순위</th>
 						<th>이름</th>
@@ -313,7 +313,7 @@
 				<div class="card-body">
 					<div class="table-responsive">
 					  <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0">
-						<thead>
+						<thead style="background: antiquewhite;">
 						  <tr>
 							<th>순위</th>
 							<th>이름</th>

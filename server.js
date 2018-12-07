@@ -30,6 +30,7 @@ app.use(express.static(__dirname + '/views'));
 
 
 //배포용
+/*
 var dbConfig = {
     host: '10.0.0.1',
 	post: 3306,
@@ -38,21 +39,20 @@ var dbConfig = {
 	database: 'snowgoodman'
 };
 var connection = initializeConnection(dbConfig);
-
+*/
 
 
 //개발용
-/*
- var connection = mysql.createConnection({
-        host: 'localhost',
-        post: 3306,
-        user: 'root',
-        password: '1q2w!!',
-        //password: 'root',
-        database: 'snowgoodman'
-    });
-connection.connect();
-*/
+var dbConfig = {
+    host: 'localhost',
+	post: 3306,
+	user: 'root',
+	password: '1q2w!!',
+	//password: 'root',
+	database: 'snowgoodman'
+};
+var connection = initializeConnection(dbConfig);
+
 
 //배포시 커넥션 끊어지는 문제로 추가
 function initializeConnection(config) {
@@ -182,6 +182,19 @@ app.engine('html', require('ejs').renderFile);
  
  
  
+  //index
+ app.get('/club',function(req,res){
+ 	connection = initializeConnection(dbConfig);
+	if(sessionCheck(req)){
+		clubPageLoad(req, res);
+	}else{
+		res.render('index.html');
+	}
+	  
+ });
+ 
+ 
+ 
 app.get('/actionIndex', function(req, res){
   connection = initializeConnection(dbConfig);
   if(sessionCheck(req)){
@@ -298,18 +311,65 @@ app.get('/getWeekRecordData',function(req,res){
 });
 
 
+app.get('/*joinClub*', function(req, res){
+	getJoinClub(req, res);
+});
+
+
 //-------------라우터----------------------
 	
 
 //--------------------펑션---------------------------
 
-
 function commonHeaderControl(type, url, req, res){
+	//유저정보를 확인하고 있다면 그걸로 세션다시 설정
+	var sess = req.session;
+	
+	//클럽정보가 없다면 db에서 
+	if(sess.clubs == undefined || sess.clubs === ''){
+		var userId = sess.userId;
+		var sql = `select * from user where id=?;`; 
+							
+		if (1 == 1) {
+			connection.query(sql, userId, function (err, rows, fields) {
+				if (!err) {
+					//res.send('success');
+					console.log('getMyRecordData ------- success');
+					if(rows.length > 0){
+						//있다면 어짜피 다른정보는 동일하고 클럽정보만 다시 가져온다.
+						sess.clubs = rows[0].clubs;
+						console.log('kajjksdfksd : ' + rows[0].clubs);
+					}
+				} else {
+					res.send('err : ' + err);
+					console.log('getMyRecordData ------- err : ' + err);
+				}
+				
+				//있든 없든 간에 다음로직 ㄱ ㄱ 
+				commonHeaderControlNext(type, url, req, res);
+				
+			});
+		}
+	}else{
+		commonHeaderControlNext(type, url, req, res);
+		
+	}
+	
+}
+
+
+function commonHeaderControlNext(type, url, req, res){
 	var sess = req.session;
 	
 	//변수들
 	var userId = sess.userId;
 	var userName = sess.userName;
+	if(userName == undefined || userName === ''){
+		if(sess.lastName != undefined && sess.lastName != ''){
+			userName = sess.lastName;
+		}
+	}
+		
 	var profilePic = sess.profilePic;
 	var city = sess.city;
 	var sex = sess.sex;
@@ -323,7 +383,7 @@ function commonHeaderControl(type, url, req, res){
       }else{
 		 console.log("파일읽기성공 -200-" + dynamicContent.toString());
 		 dynamicContent = data.toString();
-		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:black !important; margin-left:12px; margin-top:12px;">안녕하세요' + userId + '(' + userName + ')님</span><br/><input id="logout" class="success" type="button" value="로그아웃"/>');
+		 var output = dynamicContent.toString().replace('#userLine#', '<img src=' + profilePic + ' id="profile_img" class="img-circle" alt="Cinque Terre" style="width=50px; height:50px; border-radius:50%;"><span style="color:black !important; margin-left:12px; margin-top:12px;">안녕하세요' + userName + ')님</span></br></br><input id="logout" class="btn btn-primary" type="button" value="로그아웃"/>');
 		 var output2 = output.toString().replace('#authVal#', '1');
 		 
 		 if(type == 'myrecord'){
@@ -341,6 +401,7 @@ function commonHeaderControl(type, url, req, res){
 		 res.send(output2);
       }
    });
+	
 	
 }
 
@@ -397,6 +458,11 @@ function recordPageLoad(req, res){
 
 function rankPageLoad(req, res){
 	commonHeaderControl('rank', __dirname + '/views/rank.html', req, res);
+}
+
+
+function clubPageLoad(req, res){
+	commonHeaderControl('club', __dirname + '/views/club.html', req, res);
 }
 
 //인증2
@@ -538,23 +604,25 @@ function updateAthleteData(req, res, databody){
 	var username = databody.username;
 	var firstname = databody.firstname;
 	var lastname = databody.lastname;
+	if(username == undefined || username === ''){
+		username = firstname + lastname;
+	}
+	
 	var city = databody.city;
 	var state = databody.state;
 	var sex = databody.sex;
 	var profile = databody.profile;
-	var clubs = databody.clubs;
+	var clubs = databody.clubs; //클럽은 strava에서 가져오지 않음
 	var etc = '';
-	
 	
 	var sql = 'insert into user(id, username, firstname, lastname, city, state, sex, profile, clubs, etc) values(?)';
 	var values = [id, username, firstname, lastname, city, state, sex, profile, clubs, etc];
-
 	
 	if (1 == 1) {
 		connection.query(sql, [values], function (err, rows, fields) {
 			if (!err) {
 				console.log('updateAthleteData ------- success');
-				//res.send('success');
+				res.send('success');
 			} else {
 				//res.send('err : ' + err);
 				msg += '업데이트실패 : ' + err;
@@ -575,7 +643,7 @@ function getDistanceRankData(req, res){
 				ON A.athlete_id = B.id
 				GROUP BY B.id, B.username
 				ORDER BY MAX(A.distance) DESC
-				LIMIT 10;`;
+				LIMIT 10;`; //일단 10위까지만
 	if (1 == 1) {
 		connection.query(sql, function (err, rows, fields) {
 			if (!err) {
@@ -596,7 +664,8 @@ function getMyRecordData(req, res){
 	
 	var sql = `SELECT activity_id, athlete_id, state_date, distance, type, average_speed, max_speed, elev, calories
 				FROM activity
-				WHERE athlete_id = '?';`;
+				WHERE athlete_id = '?'
+				ORDER BY state_date asc;`; //맨날 타도 시즌합쳐도 100일 밖에 안됨 리미트 안걸음
 				
 	var userId = sess.userId;
 					
@@ -733,13 +802,93 @@ function getWeekRecordData(req, res){
 				res.send(rows);
 			} else {
 				res.send('err : ' + err);
-				console.log('getWeekRecordData err ------- err');
+				console.log('getWeekRecordData err -------' + err);
 			}
 		});
 	}
 	
 }
 
+//req.query.000
+function getJoinClub(req, res){
+	var userConfirm = req.query.type;
+	if(userConfirm === '22'){ //유저에게 확인받았다면
+		clubUpdating(req, res);
+		return;
+	}
+	
+	//클럽을 체크한다
+	getSelectClub(req, res);
+	
+}
+
+function getSelectClub(req, res){
+	var sess = req.session;
+	var param = req.query.clubname;
+	console.log(param);
+	var sql = `select count(*) as cnt from user where clubs=?;`;
+					
+	if (1 == 1) {
+		connection.query(sql, param, function (err, rows, fields) {
+			if (!err) {
+				//res.send('success');
+				console.log('getSelectClub ------- success');
+				updateClubs(req, res, rows);
+			} else {
+				console.log('getSelectClub err -------' + err);
+				updateClubs(req, res, 'err');
+			}
+		});
+	}
+	
+}
+
+
+function updateClubs(req, res, data){
+	var clubCheck = data;
+	if(clubCheck != 'err'){
+		console.log('clubCheck-----------' + clubCheck);
+		if(clubCheck.length > 0 && clubCheck[0].cnt > 0){
+			//그 이름의 클럽이 있다
+			res.send('2'); //2 동일이름존재
+		}else{
+			clubUpdating(req, res);
+		}
+	}else{
+		res.send('err : ' + clubCheck);
+	}
+	
+}
+
+
+
+function clubUpdating(req, res){
+	//없다 가입/생성
+	var sess = req.session;
+	var userId = sess.userId;
+	var clubs = req.query.clubname; //프론트에서 가져온
+	var param = [clubs, userId];
+	
+	var sql = `update user set clubs = ? where id = ?;`;
+	if (1 == 1) {
+		connection.query(sql, param, function (err, rows, fields) {
+			if (!err) {
+				console.log('getJoinClub ------- success');
+				//res.send('success');
+				//db업데이트후 세션에 정보 업데이트
+				console.log('sess.clubs 업데이트 :' + sess.clubs + '를' + clubs + '로');
+				sess.clubs = clubs;
+				console.log('sess.clubs 업데이트확인 :' + sess.clubs);
+				
+				res.send('1'); //1 가입/변경/생성완료
+			} else {
+				console.log('getJoinClub ------- err : ' + err);
+				res.send('err : ' + err);
+			}
+		});
+	}
+	
+}
 
 
 //핸들링
@@ -766,23 +915,21 @@ function handleResponse(response, req, res, type) {
 		sess.access_token = jsonContent.access_token;
 		sess.refresh_token = jsonContent.refresh_token;
 		sess.userId = jsonContent.athlete.id;
+		sess.firstName = jsonContent.athlete.firstname;
+		sess.lastName = jsonContent.athlete.lastname;
 		sess.userName = jsonContent.athlete.username;
 		sess.profilePic = jsonContent.athlete.profile;
 		sess.city = jsonContent.athlete.city;
 		sess.sex = jsonContent.athlete.sex;
-		sess.clubs = jsonContent.athlete.clubs;
+		sess.clubs = jsonContent.athlete.clubs; //클럽은 db에 있음
 		
 		//console.log('sess--------------------- : ' + sess);
 		res.send('<h3>연결에 성공하였습니다. 데이터를 분석중입니다! </h3><script>window.location.replace("' + './actionIndex' + '");</script>');
 		
 	}else if(type === 'athlete'){
-		//DB에 저장하는 로직 필요
-		//...
 		console.log(serverData);
 		res.send(serverData.toString());
 	}else if(type === 'activity'){
-		//DB에 저장하는 로직 필요
-		//...
 		console.log(serverData.toString());
 		res.send(serverData.toString());
 	}
@@ -794,8 +941,8 @@ function handleResponse(response, req, res, type) {
 //-----------------------------------------------
 
 //개발용 
-//var server = app.listen(8080, function(){
+var server = app.listen(8080, function(){
 // 배포용 
-var server = app.listen(8001, function(){
+//var server = app.listen(8001, function(){
 	    console.log("------- server has started --------")
 });
